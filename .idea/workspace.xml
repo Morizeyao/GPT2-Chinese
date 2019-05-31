@@ -2,11 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="6a7a4da6-5bcb-468d-a112-f4793978c99c" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/generate.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/model_config.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tokenization.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/train.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/train.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -28,8 +24,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/train.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="485">
-              <caret line="46" column="22" lean-forward="true" selection-start-line="46" selection-start-column="22" selection-end-line="46" selection-end-column="22" />
+            <state relative-caret-position="731">
+              <caret line="43" column="50" selection-start-line="43" selection-start-column="50" selection-end-line="43" selection-end-column="50" />
               <folding>
                 <element signature="e#0#30#0" expanded="true" />
               </folding>
@@ -38,9 +34,30 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/.gitignore">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="17">
+              <caret line="1" column="14" selection-start-line="1" selection-start-column="14" selection-end-line="1" selection-end-column="14" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/README.md">
+          <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+            <state split_layout="SPLIT">
+              <first_editor relative-caret-position="51">
+                <caret line="3" selection-start-line="3" selection-end-line="3" />
+              </first_editor>
+              <second_editor />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/generate.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1309">
+            <state relative-caret-position="370">
               <caret line="77" column="30" selection-start-line="77" selection-start-column="30" selection-end-line="77" selection-end-column="30" />
               <folding>
                 <element signature="e#0#15#0" expanded="true" />
@@ -70,8 +87,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file:///usr/local/lib/python3.7/site-packages/pytorch_pretrained_bert/modeling_gpt2.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="208">
-              <caret line="606" column="8" selection-start-line="606" selection-start-column="8" selection-end-line="606" selection-end-column="8" />
+            <state relative-caret-position="217">
+              <caret line="521" column="8" selection-start-line="521" selection-start-column="8" selection-end-line="521" selection-end-column="8" />
             </state>
           </provider>
         </entry>
@@ -79,8 +96,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/model_config.json">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="136">
-              <caret line="8" column="21" selection-start-line="8" selection-start-column="21" selection-end-line="8" selection-end-column="21" />
+            <state relative-caret-position="153">
+              <caret line="9" column="1" lean-forward="true" selection-start-line="9" selection-start-column="1" selection-end-line="9" selection-end-column="1" />
             </state>
           </provider>
         </entry>
@@ -103,6 +120,8 @@
         <option value="$PROJECT_DIR$/main.py" />
         <option value="$PROJECT_DIR$/model_config.json" />
         <option value="$PROJECT_DIR$/generate.py" />
+        <option value="$PROJECT_DIR$/.gitignore" />
+        <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/train.py" />
       </list>
     </option>
@@ -129,6 +148,11 @@
               <item name="GPT2-Chinese" type="b2602c69:ProjectViewProjectNode" />
               <item name="GPT2-Chinese" type="462c0819:PsiDirectoryNode" />
               <item name="cache" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="GPT2-Chinese" type="b2602c69:ProjectViewProjectNode" />
+              <item name="GPT2-Chinese" type="462c0819:PsiDirectoryNode" />
+              <item name="data" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -199,12 +223,12 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1559268412236</updated>
-      <workItem from="1559268416409" duration="5897000" />
+      <workItem from="1559268416409" duration="8340000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="5897000" />
+    <option name="totallyTimeSpent" value="8340000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1680" height="1027" extended-state="0" />
@@ -237,7 +261,7 @@
     <option name="version" value="1" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/GPT2_Chinese$train.coverage" NAME="train Coverage Results" MODIFIED="1559274311585" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/GPT2_Chinese$train.coverage" NAME="train Coverage Results" MODIFIED="1559281064391" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
   <component name="editorHistoryManager">
     <entry file="file:///usr/local/lib/python3.7/site-packages/pytorch_pretrained_bert/__init__.py">
@@ -253,24 +277,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/model_config.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="136">
-          <caret line="8" column="21" selection-start-line="8" selection-start-column="21" selection-end-line="8" selection-end-column="21" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/cache/8a0c070123c1f794c42a29c6904beb7c1b8715741e235bee04aca2c7636fc83f.9b42061518a39ca00b8b52059fd2bede8daa613f8a8671500e518a8c29de8c00">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="139">
           <caret line="93" column="10" lean-forward="true" selection-start-line="93" selection-start-column="10" selection-end-line="93" selection-end-column="10" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tokenization.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="295">
-          <caret line="90" column="8" selection-start-line="90" selection-start-column="8" selection-end-line="90" selection-end-column="8" />
         </state>
       </provider>
     </entry>
@@ -284,16 +294,26 @@
     <entry file="file://$PROJECT_DIR$/cache/8a0c070123c1f794c42a29c6904beb7c1b8715741e235bee04aca2c7636fc83f.9b42061518a39ca00b8b52059fd2bede8daa613f8a8671500e518a8c29de8c00.json">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file:///usr/local/lib/python3.7/site-packages/pytorch_pretrained_bert/modeling_gpt2.py">
+    <entry file="file://$PROJECT_DIR$/.gitignore">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="208">
-          <caret line="606" column="8" selection-start-line="606" selection-start-column="8" selection-end-line="606" selection-end-column="8" />
+        <state relative-caret-position="17">
+          <caret line="1" column="14" selection-start-line="1" selection-start-column="14" selection-end-line="1" selection-end-column="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/README.md">
+      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+        <state split_layout="SPLIT">
+          <first_editor relative-caret-position="51">
+            <caret line="3" selection-start-line="3" selection-end-line="3" />
+          </first_editor>
+          <second_editor />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/generate.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1309">
+        <state relative-caret-position="370">
           <caret line="77" column="30" selection-start-line="77" selection-start-column="30" selection-end-line="77" selection-end-column="30" />
           <folding>
             <element signature="e#0#15#0" expanded="true" />
@@ -301,10 +321,31 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/tokenization.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="295">
+          <caret line="90" column="8" selection-start-line="90" selection-start-column="8" selection-end-line="90" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/local/lib/python3.7/site-packages/pytorch_pretrained_bert/modeling_gpt2.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="217">
+          <caret line="521" column="8" selection-start-line="521" selection-start-column="8" selection-end-line="521" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/model_config.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="153">
+          <caret line="9" column="1" lean-forward="true" selection-start-line="9" selection-start-column="1" selection-end-line="9" selection-end-column="1" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/train.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="485">
-          <caret line="46" column="22" lean-forward="true" selection-start-line="46" selection-start-column="22" selection-end-line="46" selection-end-column="22" />
+        <state relative-caret-position="731">
+          <caret line="43" column="50" selection-start-line="43" selection-start-column="50" selection-end-line="43" selection-end-column="50" />
           <folding>
             <element signature="e#0#30#0" expanded="true" />
           </folding>

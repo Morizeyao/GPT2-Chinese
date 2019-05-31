@@ -39,12 +39,17 @@ class CorpusDataset(Dataset):
     def __init__(self, data_path=DATA_PATH, raw=True):
         if raw:
             with open(data_path, 'r') as f:
+                print('reading lines')
                 self.lines = f.readlines()
-                self.lines = tqdm([full_tokenizer.tokenize(line) for line in self.lines])
-                self.lines = tqdm([full_tokenizer.convert_tokens_to_ids(line) for line in self.lines])
+                print('tokenizing lines, may use 3 hours for 8Gb content')
+                self.lines = [full_tokenizer.tokenize(line) for line in self.lines]
+                print('converting tokens to ids')
+                self.lines = [full_tokenizer.convert_tokens_to_ids(line) for line in self.lines]
             with open('./data/tokenized_train.txt', 'w') as f:
                 for line in self.lines:
                     f.write(line)
+            print('finish')
+            exit(1)
         else:
             with open(data_path, 'r') as f:
                 self.lines = f.readlines()
