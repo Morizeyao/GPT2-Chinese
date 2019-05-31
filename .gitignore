@@ -1,3 +1,4 @@
 
 data/train.txt
-./idea
+.idea
+__pycache__
