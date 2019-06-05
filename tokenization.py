@@ -103,12 +103,12 @@ class BertTokenizer(object):
                 ids.append(self.vocab[token])
             except Exception:
                 ids.append(self.vocab["[UNK]"])
-        if len(ids) > self.max_len:
-            raise ValueError(
-                "Token indices sequence length is longer than the specified maximum "
-                " sequence length for this BERT model ({} > {}). Running this"
-                " sequence through BERT will result in indexing errors".format(len(ids), self.max_len)
-            )
+        # if len(ids) > self.max_len:
+        #     raise ValueError(
+        #         "Token indices sequence length is longer than the specified maximum "
+        #         " sequence length for this BERT model ({} > {}). Running this"
+        #         " sequence through BERT will result in indexing errors".format(len(ids), self.max_len)
+        #     )
         return ids
 
     def convert_ids_to_tokens(self, ids):
