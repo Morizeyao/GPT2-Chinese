@@ -2,3 +2,5 @@
 data
 .idea
 __pycache__
+.floyd*
+floyd*
