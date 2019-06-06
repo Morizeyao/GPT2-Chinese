@@ -13,10 +13,10 @@ from sklearn.model_selection import train_test_split
 from keras.preprocessing.sequence import pad_sequences
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-DATA_PATH = '/data/train.txt'
-raw = True  # 是否从零开始构建数据集
-tokenizer = tokenization.BasicTokenizer()
-full_tokenizer = tokenization.BertTokenizer.from_pretrained('bert-base-chinese', cache_dir='./cache')
+RAW_DATA_PATH = 'data/train.txt'
+tokenized_data_path = '/data/'
+raw = False  # 是否从零开始构建数据集
+full_tokenizer = tokenization.BertTokenizer.from_pretrained('bert-base-chinese')
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 print('using device:', device)
 model_config = pytorch_pretrained_bert.GPT2Config.from_json_file('model_config.json')
@@ -35,11 +35,11 @@ LR = 2e-5
 LR = LR * torch.cuda.device_count() if MULTI_GPU else LR
 TRAIN_TEST_SPLIT = 0.1
 WARMUP = 0.1
-LOG_STEP = 1
+LOG_STEP = 100
 
 
 class CorpusDataset(object):
-    def __init__(self, data_path=DATA_PATH, raw=True):
+    def __init__(self, data_path=RAW_DATA_PATH, raw=True):
         if raw:
             with open(data_path, 'r') as f:
                 print('reading lines')
@@ -59,9 +59,18 @@ class CorpusDataset(object):
                         f.write('\n')
             print('finish')
         else:
-            with open('./data/tokenized_train.txt', 'r') as f:
-                self.lines = f.readlines()
-                self.lines = [line.split()[:n_ctx] for line in self.lines]
+            self.lines = []
+            for i in tqdm(range(1000)):
+                with open('./data/tokenized/tokenized_train_{}.txt'.format(i), 'r') as f:
+                    sub_lines = f.readlines()
+                    # new_sub_lines = []
+                    # for line in sub_lines:
+                    #     x = line.split()[:n_ctx]
+                    #     x = [int(item) for item in x]
+                    #     new_sub_lines.append(x)
+                    # self.lines.extend(new_sub_lines)
+                    self.lines.extend([line.split()[:n_ctx] for line in sub_lines])
+            self.lines = np.array(self.lines, dtype=np.int32)
 
     def __len__(self):
         return len(self.lines)
@@ -71,39 +80,42 @@ class CorpusDataset(object):
 
 
 def main():
-    corpus_dataset = CorpusDataset(data_path=DATA_PATH, raw=raw)
-    exit(1)
+    if raw:
+        corpus_dataset = CorpusDataset(data_path=RAW_DATA_PATH, raw=raw)
+        exit(1)
     optimizer = pytorch_pretrained_bert.optimization_openai.OpenAIAdam(model.parameters(), lr=LR, warmup=0.1, weight_decay=0.01)
     print('starting training')
     for epoch in range(EPOCHS):
-        running_loss = 0
-        for step in range(len(corpus_dataset) // BATCH_SIZE):
-            batch = corpus_dataset[step * BATCH_SIZE: (step+1) * BATCH_SIZE]
-            batch_labels = []
-            batch_inputs = []
-            for ids in batch:
-                int_ids_for_labels = [int(x) for x in ids]
-                int_ids_for_inputs = [101]
-                int_ids_for_inputs.extend([int(x) for x in ids[:-1]]) # 101 是CLS
-                batch_labels.append(int_ids_for_labels)
-                batch_inputs.append(int_ids_for_inputs)
-            batch_labels = torch.Tensor(batch_labels).long().to(device)
-            batch_inputs = torch.Tensor(batch_inputs).long().to(device)
-            print(batch_labels.shape)
-            print(batch_inputs.shape)
-
-            optimizer.zero_grad()
-            loss = model.forward(input_ids=batch_inputs, lm_labels=batch_labels)
-            if MULTI_GPU:
-                loss.sum().backward()
-                running_loss += loss.sum().item() / torch.cuda.device_count()
-            else:
-                loss.backward()
-                running_loss += loss.item()
-            optimizer.step()
-            if (step + 1) % LOG_STEP == 0:
-                print('step {} of epoch {}, loss {}'.format(step + 1, epoch + 1, running_loss / LOG_STEP))
+        for i in range(1000):
+            with open(tokenized_data_path + 'tokenized_train_{}.txt'.format(i), 'r') as f:
                 running_loss = 0
+                sub_lines = f.readlines()
+                sub_lines = [line.split()[:n_ctx] for line in sub_lines]
+                for step in range(len(sub_lines) // BATCH_SIZE):
+                    batch = sub_lines[step * BATCH_SIZE: (step+1) * BATCH_SIZE]
+                    batch_labels = []
+                    batch_inputs = []
+                    for ids in batch:
+                        int_ids_for_labels = [int(x) for x in ids]
+                        int_ids_for_inputs = [101]
+                        int_ids_for_inputs.extend([int(x) for x in ids[:-1]]) # 101 是CLS
+                        batch_labels.append(int_ids_for_labels)
+                        batch_inputs.append(int_ids_for_inputs)
+                    batch_labels = torch.Tensor(batch_labels).long().to(device)
+                    batch_inputs = torch.Tensor(batch_inputs).long().to(device)
+
+                    optimizer.zero_grad()
+                    loss = model.forward(input_ids=batch_inputs, lm_labels=batch_labels)
+                    if MULTI_GPU:
+                        loss.sum().backward()
+                        running_loss += loss.sum().item() / torch.cuda.device_count()
+                    else:
+                        loss.backward()
+                        running_loss += loss.item()
+                    optimizer.step()
+                    if (step + 1) % LOG_STEP == 0:
+                        print('step {} of piece of {} of epoch {}, loss {}'.format(step + 1, i, epoch + 1, running_loss / LOG_STEP))
+                        running_loss = 0
 
     print('training finished')
     torch.save(model, './model.pt')

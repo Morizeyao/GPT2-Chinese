@@ -12,4 +12,4 @@ var
 *.pyc
 *.sip
 .DS_Store
-data/train.txt
+data
