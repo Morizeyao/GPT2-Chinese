@@ -35,7 +35,7 @@ LR = 2e-5
 LR = LR * torch.cuda.device_count() if MULTI_GPU else LR
 TRAIN_TEST_SPLIT = 0.1
 WARMUP = 0.1
-LOG_STEP = 100
+LOG_STEP = 50
 
 
 class CorpusDataset(object):
