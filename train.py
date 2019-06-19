@@ -14,7 +14,7 @@ from keras.preprocessing.sequence import pad_sequences
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 RAW_DATA_PATH = 'data/train.txt'
-tokenized_data_path = '/data/'
+tokenized_data_path = 'data/tokenized/'
 raw = False  # 是否从零开始构建数据集
 full_tokenizer = tokenization.BertTokenizer.from_pretrained('bert-base-chinese')
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
