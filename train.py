@@ -31,9 +31,8 @@ model.to(device)
 
 EPOCHS = 5
 BATCH_SIZE = 4
-LR = 2e-5
+LR = 1e-4
 LR = LR * torch.cuda.device_count() if MULTI_GPU else LR
-TRAIN_TEST_SPLIT = 0.1
 WARMUP = 0.1
 LOG_STEP = 50
 
@@ -46,7 +45,7 @@ class CorpusDataset(object):
                 self.lines = f.readlines()
                 self.all_len = len(self.lines)
             for i in tqdm(range(1000)):
-                sublines = self.lines[self.all_len // 1000 * i : self.all_len // 1000 * (i + 1)]
+                sublines = self.lines[self.all_len // 1000 * i: self.all_len // 1000 * (i + 1)]
                 sublines = [full_tokenizer.tokenize(line) for line in sublines]
 
                 sublines = [full_tokenizer.convert_tokens_to_ids(line[:n_ctx]) for line in sublines]
@@ -83,7 +82,9 @@ def main():
     if raw:
         corpus_dataset = CorpusDataset(data_path=RAW_DATA_PATH, raw=raw)
         exit(1)
-    optimizer = pytorch_pretrained_bert.optimization_openai.OpenAIAdam(model.parameters(), lr=LR, warmup=0.1, weight_decay=0.01)
+    total_steps = 2430 * 1000 * EPOCHS / BATCH_SIZE
+    optimizer = pytorch_pretrained_bert.optimization_openai.OpenAIAdam(model.parameters(), lr=LR, warmup=0.1,
+                                                                       weight_decay=0.01, t_total=total_steps)
     print('starting training')
     for epoch in range(EPOCHS):
         for i in range(1000):
@@ -92,13 +93,13 @@ def main():
                 sub_lines = f.readlines()
                 sub_lines = [line.split()[:n_ctx] for line in sub_lines]
                 for step in range(len(sub_lines) // BATCH_SIZE):
-                    batch = sub_lines[step * BATCH_SIZE: (step+1) * BATCH_SIZE]
+                    batch = sub_lines[step * BATCH_SIZE: (step + 1) * BATCH_SIZE]
                     batch_labels = []
                     batch_inputs = []
                     for ids in batch:
                         int_ids_for_labels = [int(x) for x in ids]
                         int_ids_for_inputs = [101]
-                        int_ids_for_inputs.extend([int(x) for x in ids[:-1]]) # 101 是CLS
+                        int_ids_for_inputs.extend([int(x) for x in ids[:-1]])  # 101 是CLS
                         batch_labels.append(int_ids_for_labels)
                         batch_inputs.append(int_ids_for_inputs)
                     batch_labels = torch.Tensor(batch_labels).long().to(device)
@@ -114,8 +115,11 @@ def main():
                         running_loss += loss.item()
                     optimizer.step()
                     if (step + 1) % LOG_STEP == 0:
-                        print('step {} of piece of {} of epoch {}, loss {}'.format(step + 1, i, epoch + 1, running_loss / LOG_STEP))
+                        print('step {} of piece of {} of epoch {}, loss {}'.format(step + 1, i, epoch + 1,
+                                                                                   running_loss / LOG_STEP))
                         running_loss = 0
+        print('saving model for epoch {}'.format(epoch))
+        torch.save(model, './model.pt')
 
     print('training finished')
     torch.save(model, './model.pt')
