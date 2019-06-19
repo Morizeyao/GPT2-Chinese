@@ -87,11 +87,15 @@ def main():
                                                                        weight_decay=0.01, t_total=total_steps)
     print('starting training')
     for epoch in range(EPOCHS):
-        for i in range(1000):
+        x = np.linspace(0, 999, 1000, dtype=np.int32)
+        random.shuffle(x)
+        piece_num = 0
+        for i in x:
             with open(tokenized_data_path + 'tokenized_train_{}.txt'.format(i), 'r') as f:
                 running_loss = 0
                 sub_lines = f.readlines()
                 sub_lines = [line.split()[:n_ctx] for line in sub_lines]
+                random.shuffle(sub_lines)
                 for step in range(len(sub_lines) // BATCH_SIZE):
                     batch = sub_lines[step * BATCH_SIZE: (step + 1) * BATCH_SIZE]
                     batch_labels = []
@@ -115,9 +119,10 @@ def main():
                         running_loss += loss.item()
                     optimizer.step()
                     if (step + 1) % LOG_STEP == 0:
-                        print('step {} of piece of {} of epoch {}, loss {}'.format(step + 1, i, epoch + 1,
+                        print('step {} of piece {} of epoch {}, loss {}'.format(step + 1, piece_num, epoch + 1,
                                                                                    running_loss / LOG_STEP))
                         running_loss = 0
+            piece_num += 1
         print('saving model for epoch {}'.format(epoch))
         torch.save(model, './model.pt')
 
