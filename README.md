@@ -15,5 +15,5 @@ train.txt如果太大的话内存会不足。例如我的训练语料约有8个G
 
 ## 联系作者
 
-QQ：330501241
-Mail：ned1991@gmail.com
+ - QQ：330501241
+ - Mail：ned1991@gmail.com
