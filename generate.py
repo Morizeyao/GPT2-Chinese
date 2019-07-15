@@ -80,6 +80,7 @@ def sample_sequence(model, length, start_token=None, batch_size=None, context=No
             log_probs = F.softmax(logits, dim=-1)
             if sample:
                 prev = torch.multinomial(log_probs, num_samples=1)
+                prev = prev.unsueeze(dim=-1)
             else:
                 _, prev = torch.topk(log_probs, k=1, dim=-1)
             output = torch.cat((output, prev), dim=1)
@@ -88,7 +89,7 @@ def sample_sequence(model, length, start_token=None, batch_size=None, context=No
 
 def main():
     LENGTH = -1
-    BATCH_SIZE = 6
+    BATCH_SIZE = 1
     NSAMPLES = 18
     TEMPERATURE = 0.5
     TOPK = 5
