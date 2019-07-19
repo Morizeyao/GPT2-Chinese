@@ -9,6 +9,7 @@ import random
 import time
 from tqdm import tqdm
 from torch.utils.data import Dataset, DataLoader
+from torch.nn import DataParallel
 from sklearn.model_selection import train_test_split
 from keras.preprocessing.sequence import pad_sequences
 
@@ -26,7 +27,7 @@ model = pytorch_pretrained_bert.modeling_gpt2.GPT2LMHeadModel(config=model_confi
 MULTI_GPU = False
 if torch.cuda.device_count() > 1:
     print("Let's use", torch.cuda.device_count(), "GPUs!")
-    model = torch.nn.DataParallel(model)
+    model = DataParallel(model)
     MULTI_GPU = True
 model.to(device)
 
@@ -48,7 +49,7 @@ class CorpusDataset(object):
             for i in tqdm(range(1000)):
                 new_lines = []
                 sublines = self.lines[self.all_len // 1000 * i: self.all_len // 1000 * (i + 1)]
-                sublines = [full_tokenizer.tokenize(line) for line in sublines]
+                sublines = [full_tokenizer.tokenize(line) for line in sublines if len(line) > 128]
                 sublines = [full_tokenizer.convert_tokens_to_ids(line) for line in sublines]
                 for subline in sublines:
                     new_lines.append(subline[:n_ctx])
@@ -89,9 +90,8 @@ def main():
     if raw:
         corpus_dataset = CorpusDataset(data_path=RAW_DATA_PATH, raw=raw)
         exit(1)
-
     total_lines = 0
-    for i in range(1000):
+    for i in tqdm(range(1000)):
         with open(tokenized_data_path + 'tokenized_train_{}.txt'.format(i), 'r') as f:
             total_lines += len(f.readlines())
     total_steps = int(total_lines * EPOCHS / BATCH_SIZE)
@@ -118,14 +118,14 @@ def main():
                         int_ids_for_inputs.extend([int(x) for x in ids[:-1]])  # 101 是CLS
                         batch_labels.append(int_ids_for_labels)
                         batch_inputs.append(int_ids_for_inputs)
-                    batch_labels = torch.Tensor(batch_labels).long().to(device)
-                    batch_inputs = torch.Tensor(batch_inputs).long().to(device)
+                    batch_labels = torch.tensor(batch_labels).long().to(device)
+                    batch_inputs = torch.tensor(batch_inputs).long().to(device)
 
                     optimizer.zero_grad()
                     loss = model.forward(input_ids=batch_inputs, lm_labels=batch_labels)
                     if MULTI_GPU:
-                        loss.sum().backward()
-                        running_loss += loss.sum().item() / torch.cuda.device_count()
+                        loss.mean().backward()
+                        running_loss += loss.mean().item() / torch.cuda.device_count()
                     else:
                         loss.backward()
                         running_loss += loss.item()
@@ -136,7 +136,7 @@ def main():
                         running_loss = 0
             piece_num += 1
         print('saving model for epoch {}'.format(epoch))
-        torch.save(model.state_dict(), './model.pt')
+        torch.save(model.state_dict(), './model_epoch{}.pt'.format(epoch))
 
     print('training finished')
     torch.save(model.state_dict(), './model.pt')
