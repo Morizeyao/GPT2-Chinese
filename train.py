@@ -116,7 +116,8 @@ def main():
                     batch_inputs = torch.tensor(batch_inputs).long().to(device)
 
                     optimizer.zero_grad()
-                    loss = model.forward(input_ids=batch_inputs, lm_labels=batch_labels)
+                    outputs = model.forward(input_ids=batch_inputs, labels=batch_labels)
+                    loss, logits = outputs[:2]
 
                     if MULTI_GPU:
                         loss = loss.mean()
