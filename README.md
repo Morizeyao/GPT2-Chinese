@@ -20,7 +20,7 @@
 
 ## 语料
 
-可以从[这里](https://github.com/brightmart/nlp_chinese_corpus)下载
+可以从[这里](https://github.com/brightmart/nlp_chinese_corpus)与[这里](http://thuctc.thunlp.org/#获取链接)下载
 
 ## FP16支持
 
