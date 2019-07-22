@@ -118,10 +118,10 @@ def main():
                         running_loss = 0
             piece_num += 1
         print('saving model for epoch {}'.format(epoch))
-        torch.save(model.state_dict(), './model_epoch{}.pt'.format(epoch))
+        model.save_pretrained('./model/model_epoch{}'.format(epoch))
 
     print('training finished')
-    torch.save(model.state_dict(), './model.pt')
+    model.save_pretrained('./model/final_model')
 
 
 if __name__ == '__main__':

@@ -42,8 +42,9 @@ class CorpusDataset(object):
         if raw:
             with open(data_path, 'r') as f:
                 print('reading lines')
-                self.lines = f.readlines()
-                self.all_len = len(self.lines)
+                lines = json.load(f)
+                lines = [line['c'] for line in lines]
+                self.all_len = len(lines)
             for i in tqdm(range(1000)):
                 sublines = self.lines[self.all_len // 1000 * i: self.all_len // 1000 * (i + 1)]
                 sublines = [full_tokenizer.tokenize(line) for line in sublines]
