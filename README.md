@@ -18,6 +18,10 @@ generate.py内包含了生成文本的代码。
 
 可以从[这里](https://github.com/brightmart/nlp_chinese_corpus)下载
 
+## FP16支持
+
+我在train.py文件中加入了fp16支持，如果你安装了apex的话并且知道fp16是什么的话，可以修改变量fp61=True来启用。
+
 ## 联系作者
 
  - QQ：330501241

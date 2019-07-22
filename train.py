@@ -22,14 +22,6 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 print('using device:', device)
 model_config = pytorch_transformers.modeling_gpt2.GPT2Config.from_json_file('model_config.json')
 n_ctx = model_config.n_ctx
-stride = 128
-model = pytorch_transformers.modeling_gpt2.GPT2LMHeadModel(config=model_config)
-MULTI_GPU = False
-if torch.cuda.device_count() > 1:
-    print("Let's use", torch.cuda.device_count(), "GPUs!")
-    model = DataParallel(model)
-    MULTI_GPU = True
-model.to(device)
 
 EPOCHS = 5
 BATCH_SIZE = 4
@@ -37,13 +29,17 @@ LR = 1e-4
 # LR = LR * torch.cuda.device_count() if MULTI_GPU else LR
 WARMUP = 0.1
 LOG_STEP = 50
+stride = 128
+fp16 = False
+fp16_opt_level = '01'
+max_grad_norm = 1.0
 
 
 def build_files(data_path=RAW_DATA_PATH):
     with open(data_path, 'r') as f:
         print('reading lines')
         lines = json.load(f)
-        lines = [line['c'].replace('\n', ' [SEP] ') for line in lines] # 用[SEP]表示换行
+        lines = [line['c'].replace('\n', ' [SEP] ') for line in lines]  # 用[SEP]表示换行
         all_len = len(lines)
     for i in tqdm(range(1000)):
         new_lines = []
@@ -70,14 +66,29 @@ def main():
     if raw:
         build_files(data_path=RAW_DATA_PATH)
         exit(1)
+
+    model = pytorch_transformers.modeling_gpt2.GPT2LMHeadModel(config=model_config)
+    MULTI_GPU = False
+    if torch.cuda.device_count() > 1:
+        print("Let's use", torch.cuda.device_count(), "GPUs!")
+        model = DataParallel(model)
+        MULTI_GPU = True
+    model.to(device)
+
     total_lines = 0
     for i in tqdm(range(1000)):
         with open(tokenized_data_path + 'tokenized_train_{}.txt'.format(i), 'r') as f:
             total_lines += len(f.readlines())
     total_steps = int(total_lines * EPOCHS / BATCH_SIZE)
-    optimizer = pytorch_transformers.AdamW(model.parameters(), lr=LR, correct_bias=False)
-    scheduler = pytorch_transformers.WarmupLinearSchedule(optimizer, warmup_steps=total_steps // 10,
+    optimizer = pytorch_transformers.AdamW(model.parameters(), lr=LR, correct_bias=True)
+    scheduler = pytorch_transformers.WarmupLinearSchedule(optimizer, warmup_steps=int(total_steps * WARMUP),
                                                           t_total=total_steps)
+    if fp16:
+        try:
+            from apex import amp
+        except ImportError:
+            raise ImportError("Please install apex from https://www.github.com/nvidia/apex to use fp16 training.")
+        model, optimizer = amp.initialize(model, optimizer, opt_level=fp16_opt_level)
     print('starting training')
     for epoch in range(EPOCHS):
         x = np.linspace(0, 999, 1000, dtype=np.int32)
@@ -104,12 +115,19 @@ def main():
 
                     optimizer.zero_grad()
                     loss = model.forward(input_ids=batch_inputs, lm_labels=batch_labels)
+
                     if MULTI_GPU:
-                        loss.mean().backward()
-                        running_loss += loss.mean().item() / torch.cuda.device_count()
+                        loss = loss.mean()
+
+                    if fp16:
+                        with amp.scale_loss(loss, optimizer) as scaled_loss:
+                            scaled_loss.backward()
+                        torch.nn.utils.clip_grad_norm_(amp.master_params(optimizer), max_grad_norm)
                     else:
                         loss.backward()
-                        running_loss += loss.item()
+                        torch.nn.utils.clip_grad_norm_(model.parameters(), max_grad_norm)
+
+                    running_loss += loss.item()
                     scheduler.step()
                     optimizer.step()
                     if (step + 1) % LOG_STEP == 0:
