@@ -4,13 +4,10 @@ import torch
 import numpy as np
 import os
 import json
-import re
 import random
-import time
+from datetime import datetime
 from tqdm import tqdm
-from torch.utils.data import Dataset, DataLoader
 from torch.nn import DataParallel
-from sklearn.model_selection import train_test_split
 from keras.preprocessing.sequence import pad_sequences
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
@@ -93,6 +90,9 @@ def main():
         model, optimizer = amp.initialize(model, optimizer, opt_level=fp16_opt_level)
     print('starting training')
     for epoch in range(EPOCHS):
+        print('epoch {}'.format(epoch))
+        now = datetime.now()
+        print('time: {}'.format(now))
         x = np.linspace(0, 999, 1000, dtype=np.int32)
         random.shuffle(x)
         piece_num = 0
@@ -141,6 +141,10 @@ def main():
         if not os.path.exists('./model/model_epoch{}'.format(epoch)):
             os.mkdir('./model/model_epoch{}'.format(epoch))
         model.save_pretrained('./model/model_epoch{}'.format(epoch))
+        print('epoch {} finished'.format(epoch))
+        then = datetime.now()
+        print('time: {}'.format(then))
+        print('time for one epoch: {}'.format(then - now))
 
     print('training finished')
     if not os.path.exists('./model/final_model'):
