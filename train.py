@@ -25,10 +25,10 @@ n_ctx = model_config.n_ctx
 
 EPOCHS = 5
 BATCH_SIZE = 4
-LR = 1e-4
+LR = 2.5e-4
 # LR = LR * torch.cuda.device_count() if MULTI_GPU else LR
-WARMUP = 0.1
-LOG_STEP = 50
+WARMUP_STEPS = 2000
+LOG_STEP = 250
 stride = 128
 fp16 = False
 fp16_opt_level = '01'
@@ -83,7 +83,7 @@ def main():
             total_lines += len(f.readlines())
     total_steps = int(total_lines * EPOCHS / BATCH_SIZE)
     optimizer = pytorch_transformers.AdamW(model.parameters(), lr=LR, correct_bias=True)
-    scheduler = pytorch_transformers.WarmupLinearSchedule(optimizer, warmup_steps=int(total_steps * WARMUP),
+    scheduler = pytorch_transformers.WarmupLinearSchedule(optimizer, warmup_steps=WARMUP_STEPS,
                                                           t_total=total_steps)
     if fp16:
         try:

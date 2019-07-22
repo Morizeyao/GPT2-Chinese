@@ -31,7 +31,7 @@ model.to(device)
 
 EPOCHS = 5
 BATCH_SIZE = 4
-LR = 1e-4
+LR = 2.5e-4
 LR = LR * torch.cuda.device_count() if MULTI_GPU else LR
 WARMUP = 0.1
 LOG_STEP = 50
@@ -74,7 +74,7 @@ def main():
         corpus_dataset = CorpusDataset(data_path=RAW_DATA_PATH, raw=raw)
         exit(1)
     total_steps = 2430 * 1000 * EPOCHS / BATCH_SIZE
-    optimizer = pytorch_pretrained_bert.optimization_openai.OpenAIAdam(model.parameters(), lr=LR, warmup=0.1,
+    optimizer = pytorch_pretrained_bert.optimization_openai.OpenAIAdam(model.parameters(), lr=LR, warmup=2000/total_steps,
                                                                        weight_decay=0.01, t_total=total_steps)
     print('starting training')
     for epoch in range(EPOCHS):
