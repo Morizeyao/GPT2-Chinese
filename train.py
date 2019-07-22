@@ -11,19 +11,18 @@ from torch.nn import DataParallel
 from keras.preprocessing.sequence import pad_sequences
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-RAW_DATA_PATH = 'data/train.txt'
-tokenized_data_path = 'data/tokenized/'
-raw = True  # 是否从零开始构建数据集
 full_tokenizer = tokenization.BertTokenizer.from_pretrained('bert-base-chinese')
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 print('using device:', device)
 model_config = pytorch_transformers.modeling_gpt2.GPT2Config.from_json_file('model_config.json')
 n_ctx = model_config.n_ctx
 
+RAW_DATA_PATH = 'data/train.txt'
+tokenized_data_path = 'data/tokenized/'
+raw = True  # 是否从零开始构建数据集
 EPOCHS = 5
 BATCH_SIZE = 4
 LR = 2.5e-4
-# LR = LR * torch.cuda.device_count() if MULTI_GPU else LR
 WARMUP_STEPS = 2000
 LOG_STEP = 250
 stride = 128
@@ -79,6 +78,7 @@ def main():
         with open(tokenized_data_path + 'tokenized_train_{}.txt'.format(i), 'r') as f:
             total_lines += len(f.readlines())
     total_steps = int(total_lines * EPOCHS / BATCH_SIZE)
+    print('total steps = {}'.format(total_steps))
     optimizer = pytorch_transformers.AdamW(model.parameters(), lr=LR, correct_bias=True)
     scheduler = pytorch_transformers.WarmupLinearSchedule(optimizer, warmup_steps=WARMUP_STEPS,
                                                           t_total=total_steps)
