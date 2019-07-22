@@ -39,11 +39,11 @@ WARMUP = 0.1
 LOG_STEP = 50
 
 
-def build_files(data_path=RAW_DATA_PATH, raw=True):
+def build_files(data_path=RAW_DATA_PATH):
     with open(data_path, 'r') as f:
         print('reading lines')
         lines = json.load(f)
-        lines = [line['c'] for line in lines]
+        lines = [line['c'].replace('\n', ' [SEP] ') for line in lines] # 用[SEP]表示换行
         all_len = len(lines)
     for i in tqdm(range(1000)):
         new_lines = []
@@ -52,10 +52,10 @@ def build_files(data_path=RAW_DATA_PATH, raw=True):
         sublines = [full_tokenizer.convert_tokens_to_ids(line) for line in sublines]
         for subline in sublines:
             new_lines.append(subline[:n_ctx])
-            start_point = 128
-            while start_point + n_ctx < len(subline) + 256:
+            start_point = stride
+            while start_point + n_ctx < len(subline) + stride * 2:
                 new_lines.append(subline[start_point:start_point + n_ctx])
-                start_point += 128
+                start_point += stride
         new_lines = pad_sequences(new_lines, maxlen=n_ctx, padding='post', truncating='post')
         with open('./data/tokenized/tokenized_train_{}.txt'.format(i), 'w') as f:
             for line in new_lines:
@@ -118,9 +118,13 @@ def main():
                         running_loss = 0
             piece_num += 1
         print('saving model for epoch {}'.format(epoch))
+        if not os.path.exists('./model/model_epoch{}'.format(epoch)):
+            os.mkdir('./model/model_epoch{}'.format(epoch))
         model.save_pretrained('./model/model_epoch{}'.format(epoch))
 
     print('training finished')
+    if not os.path.exists('./model/final_model'):
+        os.mkdir('./model/final_model')
     model.save_pretrained('./model/final_model')
 
 

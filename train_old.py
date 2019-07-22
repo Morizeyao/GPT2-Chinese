@@ -35,6 +35,7 @@ LR = 1e-4
 LR = LR * torch.cuda.device_count() if MULTI_GPU else LR
 WARMUP = 0.1
 LOG_STEP = 50
+stride = 128
 
 
 class CorpusDataset(object):
@@ -42,40 +43,30 @@ class CorpusDataset(object):
         if raw:
             with open(data_path, 'r') as f:
                 print('reading lines')
-                lines = json.load(f)
-                lines = [line['c'] for line in lines]
-                self.all_len = len(lines)
+                self.lines = json.load(f)
+                self.lines = [line['c'].replace('\n', ' [SEP] ') for line in self.lines]
+                self.all_len = len(self.lines)
             for i in tqdm(range(1000)):
+                new_lines = []
                 sublines = self.lines[self.all_len // 1000 * i: self.all_len // 1000 * (i + 1)]
-                sublines = [full_tokenizer.tokenize(line) for line in sublines]
-                sublines = [full_tokenizer.convert_tokens_to_ids(line[:n_ctx]) for line in sublines]
-                sublines = pad_sequences(sublines, maxlen=n_ctx, padding='post', truncating='post')
+                sublines = [full_tokenizer.tokenize(line) for line in sublines if len(line) > 128]
+                sublines = [full_tokenizer.convert_tokens_to_ids(line) for line in sublines]
+                for subline in sublines:
+                    new_lines.append(subline[:n_ctx])
+                    start_point = stride
+                    while start_point + n_ctx < len(subline) + stride * 2:
+                        new_lines.append(subline[start_point:start_point + n_ctx])
+                        start_point += stride
+                new_lines = pad_sequences(new_lines, maxlen=n_ctx, padding='post', truncating='post')
                 with open('./data/tokenized/tokenized_train_{}.txt'.format(i), 'w') as f:
-                    for line in sublines:
+                    for line in new_lines:
                         for id in line[:-1]:
                             f.write(str(id) + ' ')
                         f.write(str(line[-1]))
                         f.write('\n')
             print('finish')
         else:
-            self.lines = []
-            for i in tqdm(range(1000)):
-                with open('./data/tokenized/tokenized_train_{}.txt'.format(i), 'r') as f:
-                    sub_lines = f.readlines()
-                    # new_sub_lines = []
-                    # for line in sub_lines:
-                    #     x = line.split()[:n_ctx]
-                    #     x = [int(item) for item in x]
-                    #     new_sub_lines.append(x)
-                    # self.lines.extend(new_sub_lines)
-                    self.lines.extend([line.split()[:n_ctx] for line in sub_lines])
-            self.lines = np.array(self.lines, dtype=np.int32)
-
-    def __len__(self):
-        return len(self.lines)
-
-    def __getitem__(self, idx):
-        return self.lines[idx]
+            pass
 
 
 def main():
