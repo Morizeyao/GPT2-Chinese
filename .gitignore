@@ -2,5 +2,6 @@
 data
 .idea
 __pycache__
-.floyd*
-floyd*
+/.gitignore
+/.gitattributes
+model/
