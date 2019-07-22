@@ -36,8 +36,8 @@ max_grad_norm = 1.0
 
 
 def build_files(data_path=RAW_DATA_PATH):
-    if not os.path.exists('.data/tokenized'):
-        os.mkdir('.data/tokenized')
+    if not os.path.exists(tokenized_data_path):
+        os.mkdir(tokenized_data_path)
     with open(data_path, 'r') as f:
         print('reading lines')
         lines = json.load(f)
@@ -55,7 +55,7 @@ def build_files(data_path=RAW_DATA_PATH):
                 new_lines.append(subline[start_point:start_point + n_ctx])
                 start_point += stride
         new_lines = pad_sequences(new_lines, maxlen=n_ctx, padding='post', truncating='post')
-        with open('./data/tokenized/tokenized_train_{}.txt'.format(i), 'w') as f:
+        with open(tokenized_data_path + 'tokenized_train_{}.txt'.format(i), 'w') as f:
             for line in new_lines:
                 for id in line[:-1]:
                     f.write(str(id) + ' ')
