@@ -36,6 +36,8 @@ max_grad_norm = 1.0
 
 
 def build_files(data_path=RAW_DATA_PATH):
+    if not os.path.exists('.data/tokenized'):
+        os.mkdir('.data/tokenized')
     with open(data_path, 'r') as f:
         print('reading lines')
         lines = json.load(f)
