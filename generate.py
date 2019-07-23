@@ -61,7 +61,7 @@ def top_filtering(logits, top_k=5, top_p=0.9, threshold=-float('Inf'), filter_va
     return logits
 
 
-def sample_sequence(model, length, start_token=None, batch_size=None, context=None, temperature=1, top_k=0,
+def sample_sequence(model, length, start_token=None, batch_size=None, context=None, temperature=1.0, top_k=0,
                     device='cuda', sample=True):
     if start_token is None:
         assert context is not None, 'Specify exactly one of start_token and context!'
@@ -73,7 +73,7 @@ def sample_sequence(model, length, start_token=None, batch_size=None, context=No
     output = context
     past = None
     with torch.no_grad():
-        for i in trange(length):
+        for _ in trange(length):
             logits, past = model(prev, past=past)
             logits = logits[:, -1, :] / temperature
             logits = top_filtering(logits)
@@ -95,7 +95,7 @@ def main():
     TEMPERATURE = 0.5
     TOPK = 5
 
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = "cuda" if torch.cuda.is_available() else "cpu"
 
     tokenizer = tokenization.BertTokenizer.from_pretrained('bert-base-chinese', cache_dir='./cache')
     model_config = pytorch_transformers.GPT2Config.from_json_file('model_config.json')
