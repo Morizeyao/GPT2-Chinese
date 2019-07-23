@@ -138,11 +138,15 @@ def main():
                                                                                 running_loss / LOG_STEP))
                         running_loss = 0
             piece_num += 1
+
         print('saving model for epoch {}'.format(epoch))
         if not os.path.exists('./model/model_epoch{}'.format(epoch)):
             os.mkdir('./model/model_epoch{}'.format(epoch))
         model.save_pretrained('./model/model_epoch{}'.format(epoch))
+        torch.save(scheduler.state_dict(), './model/model_epoch{}/scheduler.pt'.format(epoch))
+        torch.save(optimizer.state_dict(), './model/model_epoch{}/optimizer.pt'.format(epoch))
         print('epoch {} finished'.format(epoch))
+
         then = datetime.now()
         print('time: {}'.format(then))
         print('time for one epoch: {}'.format(then - now))
@@ -151,6 +155,9 @@ def main():
     if not os.path.exists('./model/final_model'):
         os.mkdir('./model/final_model')
     model.save_pretrained('./model/final_model')
+    torch.save(scheduler.state_dict(), './model/final_model/scheduler.pt'.format(epoch))
+    torch.save(optimizer.state_dict(), './model/final_model/optimizer.pt'.format(epoch))
+
 
 
 if __name__ == '__main__':
