@@ -16,7 +16,10 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 RAW_DATA_PATH = 'data/train.txt'
 tokenized_data_path = 'data/tokenized/'
 raw = True  # 是否从零开始构建数据集
-full_tokenizer = tokenization.BertTokenizer.from_pretrained('bert-base-chinese')
+full_tokenizer = tokenization.BertTokenizer(vocab_file='cache/vocab.txt', never_split=['[UNK]',
+                                                                                            '[CLS]',
+                                                                                            '[SEP]',
+                                                                                            '[MASK]'])
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 print('using device:', device)
 model_config = pytorch_pretrained_bert.GPT2Config.from_json_file('model_config.json')

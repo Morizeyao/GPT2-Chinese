@@ -97,7 +97,10 @@ def main():
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    tokenizer = tokenization.BertTokenizer.from_pretrained('bert-base-chinese', cache_dir='./cache')
+    tokenizer = tokenization.BertTokenizer(vocab_file='cache/vocab.txt', never_split=['[UNK]',
+                                                                                                '[CLS]',
+                                                                                                '[SEP]',
+                                                                                                '[MASK]'])
     model_config = pytorch_pretrained_bert.GPT2Config.from_json_file('model_config.json')
     model_state_dict = torch.load('./model.pt')
     model = GPT2LMHeadModel(config=model_config)
