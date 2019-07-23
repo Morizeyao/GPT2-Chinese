@@ -3,7 +3,7 @@ import logging
 import torch
 import torch.nn.functional as F
 import numpy as np
-import tokenization
+from pytorch_transformers import tokenization_bert
 import pytorch_transformers
 from tqdm import trange
 from pytorch_transformers import GPT2LMHeadModel
@@ -97,7 +97,7 @@ def main():
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
-    tokenizer = tokenization.BertTokenizer.from_pretrained('bert-base-chinese', cache_dir='./cache')
+    tokenizer = tokenization_bert.BertTokenizer.from_pretrained('bert-base-chinese', cache_dir='./cache')
     model_config = pytorch_transformers.GPT2Config.from_json_file('model_config.json')
     model = GPT2LMHeadModel(config=model_config).from_pretrained('model/final_model')
     model.to(device)

@@ -3,7 +3,7 @@ import logging
 import torch
 import torch.nn.functional as F
 import numpy as np
-import tokenization
+from pytorch_pretrained_bert import tokenization
 import pytorch_pretrained_bert
 from tqdm import trange
 from pytorch_pretrained_bert import GPT2LMHeadModel
