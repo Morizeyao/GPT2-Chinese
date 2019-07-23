@@ -32,6 +32,7 @@ stride = 128
 fp16 = False
 fp16_opt_level = '01'
 max_grad_norm = 1.0
+num_pieces = 1000
 
 
 def build_files(data_path=RAW_DATA_PATH):
@@ -42,9 +43,9 @@ def build_files(data_path=RAW_DATA_PATH):
         lines = json.load(f)
         lines = [line['c'].replace('\n', ' [SEP] ') for line in lines]  # 用[SEP]表示换行
         all_len = len(lines)
-    for i in tqdm(range(1000)):
+    for i in tqdm(range(num_pieces)):
         new_lines = []
-        sublines = lines[all_len // 1000 * i: all_len // 1000 * (i + 1)]
+        sublines = lines[all_len // num_pieces * i: all_len // num_pieces * (i + 1)]
         sublines = [full_tokenizer.tokenize(line) for line in sublines if len(line) > 128]
         sublines = [full_tokenizer.convert_tokens_to_ids(line) for line in sublines]
         for subline in sublines:
@@ -77,7 +78,7 @@ def main():
     model.to(device)
 
     total_lines = 0
-    for i in tqdm(range(1000)):
+    for i in tqdm(range(num_pieces)):
         with open(tokenized_data_path + 'tokenized_train_{}.txt'.format(i), 'r') as f:
             total_lines += len(f.readlines())
     total_steps = int(total_lines * EPOCHS / BATCH_SIZE)
@@ -96,7 +97,7 @@ def main():
         print('epoch {}'.format(epoch))
         now = datetime.now()
         print('time: {}'.format(now))
-        x = np.linspace(0, 999, 1000, dtype=np.int32)
+        x = np.linspace(0, num_pieces - 1, num_pieces, dtype=np.int32)
         random.shuffle(x)
         piece_num = 0
         for i in x:
