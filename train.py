@@ -11,10 +11,7 @@ from torch.nn import DataParallel
 from keras.preprocessing.sequence import pad_sequences
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-full_tokenizer = tokenization_bert.BertTokenizer(vocab_file='cache/vocab.txt', never_split=['[UNK]',
-                                                                                            '[CLS]',
-                                                                                            '[SEP]',
-                                                                                            '[MASK]'])
+full_tokenizer = tokenization_bert.BertTokenizer.from_pretrained('bert-base-chinese')
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 print('using device:', device)
 model_config = pytorch_transformers.modeling_gpt2.GPT2Config.from_json_file('model_config.json')
