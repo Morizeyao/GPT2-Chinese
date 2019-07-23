@@ -76,11 +76,12 @@ def sample_sequence(model, length, start_token=None, batch_size=None, context=No
         for i in trange(length):
             logits, past = model(prev, past=past)
             logits = logits[:, -1, :] / temperature
+            logits = logits.squeeze(0)
             logits = top_filtering(logits)
             log_probs = F.softmax(logits, dim=-1)
             if sample:
                 prev = torch.multinomial(log_probs, num_samples=1)
-                prev = prev.unsueeze(dim=-1)
+                prev = prev.unsqueeze(dim=-1)
             else:
                 _, prev = torch.topk(log_probs, k=1, dim=-1)
             output = torch.cat((output, prev), dim=1)
@@ -99,7 +100,8 @@ def main():
     tokenizer = tokenization.BertTokenizer.from_pretrained('bert-base-chinese', cache_dir='./cache')
     model_config = pytorch_pretrained_bert.GPT2Config.from_json_file('model_config.json')
     model_state_dict = torch.load('./model.pt')
-    model = GPT2LMHeadModel(config=model_config).load_state_dict(model_state_dict)
+    model = GPT2LMHeadModel(config=model_config)
+    model.load_state_dict(model_state_dict)
     model.to(device)
     model.eval()
 

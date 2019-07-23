@@ -115,10 +115,12 @@ def main():
                         running_loss = 0
             piece_num += 1
         print('saving model for epoch {}'.format(epoch))
-        torch.save(model.state_dict(), './model.pt')
+        model_to_save = model.module if MULTI_GPU else model
+        torch.save(model_to_save.module.state_dict(), './model.pt')
 
     print('training finished')
-    torch.save(model.state_dict(), './model.pt')
+    model_to_save = model.module if MULTI_GPU else model
+    torch.save(model_to_save.module.state_dict(), './model.pt')
 
 
 if __name__ == '__main__':

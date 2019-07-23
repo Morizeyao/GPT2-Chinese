@@ -77,10 +77,11 @@ def sample_sequence(model, length, start_token=None, batch_size=None, context=No
             logits, past = model(prev, past=past)
             logits = logits[:, -1, :] / temperature
             logits = top_filtering(logits)
+            logits = logits.squeeze(0)
             log_probs = F.softmax(logits, dim=-1)
             if sample:
                 prev = torch.multinomial(log_probs, num_samples=1)
-                prev = prev.unsueeze(dim=-1)
+                prev = prev.unsqueeze(dim=-1)
             else:
                 _, prev = torch.topk(log_probs, k=1, dim=-1)
             output = torch.cat((output, prev), dim=1)
