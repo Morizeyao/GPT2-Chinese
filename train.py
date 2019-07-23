@@ -155,8 +155,8 @@ def main():
     if not os.path.exists('./model/final_model'):
         os.mkdir('./model/final_model')
     model.save_pretrained('./model/final_model')
-    torch.save(scheduler.state_dict(), './model/final_model/scheduler.pt'.format(epoch))
-    torch.save(optimizer.state_dict(), './model/final_model/optimizer.pt'.format(epoch))
+    torch.save(scheduler.state_dict(), './model/final_model/scheduler.pt')
+    torch.save(optimizer.state_dict(), './model/final_model/optimizer.pt')
 
 
 
