@@ -19,7 +19,7 @@ print('using device:', device)
 
 RAW_DATA_PATH = 'data/train.txt'
 tokenized_data_path = 'data/tokenized_chunk/'
-raw = False  # 是否从零开始构建数据集
+raw = True  # 是否从零开始构建数据集
 EPOCHS = 5
 BATCH_SIZE = 4
 LR = 2.5e-4
@@ -42,12 +42,12 @@ def build_files(data_path=RAW_DATA_PATH):
         all_len = len(lines)
     for i in tqdm(range(num_pieces)):
         sublines = lines[all_len // num_pieces * i: all_len // num_pieces * (i + 1)]
-        sublines = [full_tokenizer.tokenize(line) for line in sublines if len(line) > 128]
+        sublines = [full_tokenizer.tokenize(line) for line in sublines if len(line) > 128]  # 只考虑长度超过128的句子
         sublines = [full_tokenizer.convert_tokens_to_ids(line) for line in sublines]
         full_line = []
         for subline in sublines:
             full_line.extend(subline)
-            full_line.append(101)  # 文章之间添加CLS表示文章结束, 段落之间使用SEP表示段落结束
+            full_line.append(101)  # 101是CLS，文章之间添加CLS表示文章结束, 段落之间使用SEP表示段落结束
         with open(tokenized_data_path + 'tokenized_train_{}.txt'.format(i), 'w') as f:
             for id in full_line[:-1]:
                 f.write(str(id) + ' ')
@@ -69,11 +69,12 @@ def main():
         MULTI_GPU = True
     model.to(device)
 
-    total_lines = 0
+    total_tokens = 0
     for i in tqdm(range(num_pieces)):
         with open(tokenized_data_path + 'tokenized_train_{}.txt'.format(i), 'r') as f:
-            total_lines += len(f.readlines())
-    total_steps = int(total_lines * EPOCHS / BATCH_SIZE)
+            total_tokens += len(f.read().split())
+    num_chunks = total_tokens // stride
+    total_steps = int(num_chunks * EPOCHS / BATCH_SIZE)
     print('total steps = {}'.format(total_steps))
     optimizer = pytorch_transformers.AdamW(model.parameters(), lr=LR, correct_bias=True)
     scheduler = pytorch_transformers.WarmupLinearSchedule(optimizer, warmup_steps=WARMUP_STEPS,
