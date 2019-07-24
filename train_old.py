@@ -92,8 +92,8 @@ def main():
                     batch_labels = []
                     batch_inputs = []
                     for ids in batch:
-                        int_ids_for_labels = [int(x) for x in ids][1:]
-                        int_ids_for_inputs = [int(x) for x in ids[:-1]]
+                        int_ids_for_labels = [int(x) for x in ids]
+                        int_ids_for_inputs = [int(x) for x in ids]
                         batch_labels.append(int_ids_for_labels)
                         batch_inputs.append(int_ids_for_inputs)
                     batch_labels = torch.tensor(batch_labels).long().to(device)
