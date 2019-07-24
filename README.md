@@ -39,4 +39,5 @@
  
 ## 生成样例
 
+- 此处[SEP]表示换行
 - ![avatar](sample/doupo.jpeg)
