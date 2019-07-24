@@ -14,7 +14,7 @@
 
 - generate.py 与 train.py 分别是生成与训练的脚本，使用pytorch-transformers库。
 - generate_old.py 与 train_old.py 是旧版的生成与训练脚本，使用pytorch-pretrained-bert库。
-- tokenization.py 是我修改过的pytorch版本bert tokenizer文件，专用于本项目。
+- train_old_doupo.py 是专用于训练斗破苍穹语料的脚本
 
 ## 注意
 
