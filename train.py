@@ -13,7 +13,7 @@ from keras.preprocessing.sequence import pad_sequences
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 model_config = pytorch_transformers.modeling_gpt2.GPT2Config.from_json_file('model_config.json')
 n_ctx = model_config.n_ctx
-full_tokenizer = tokenization_bert.BertTokenizer.from_pretrained('bert-base-chinese')
+full_tokenizer = tokenization_bert.BertTokenizer(vocab_file='cache/vocab.txt')
 full_tokenizer.max_len = n_ctx
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 print('using device:', device)
