@@ -8,7 +8,6 @@ import random
 from datetime import datetime
 from tqdm import tqdm
 from torch.nn import DataParallel
-from keras.preprocessing.sequence import pad_sequences
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 model_config = pytorch_transformers.modeling_gpt2.GPT2Config.from_json_file('model_config.json')
@@ -19,18 +18,18 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 print('using device:', device)
 
 RAW_DATA_PATH = 'data/train.txt'
-tokenized_data_path = 'data/tokenized/'
-raw = True  # 是否从零开始构建数据集
+tokenized_data_path = 'data/tokenized_chunk/'
+raw = False  # 是否从零开始构建数据集
 EPOCHS = 5
 BATCH_SIZE = 4
 LR = 2.5e-4
 WARMUP_STEPS = 2000
 LOG_STEP = 250
-stride = 128
+stride = 256
 fp16 = False
 fp16_opt_level = '01'
 max_grad_norm = 1.0
-num_pieces = 1000
+num_pieces = 100
 
 
 def build_files(data_path=RAW_DATA_PATH):
@@ -42,23 +41,18 @@ def build_files(data_path=RAW_DATA_PATH):
         lines = [line['c'].replace('\n', ' [SEP] ') for line in lines]  # 用[SEP]表示换行
         all_len = len(lines)
     for i in tqdm(range(num_pieces)):
-        new_lines = []
         sublines = lines[all_len // num_pieces * i: all_len // num_pieces * (i + 1)]
         sublines = [full_tokenizer.tokenize(line) for line in sublines if len(line) > 128]
         sublines = [full_tokenizer.convert_tokens_to_ids(line) for line in sublines]
+        full_line = []
         for subline in sublines:
-            new_lines.append(subline[:n_ctx])
-            start_point = stride
-            while start_point + n_ctx < len(subline) + stride * 2:
-                new_lines.append(subline[start_point:start_point + n_ctx])
-                start_point += stride
-        new_lines = pad_sequences(new_lines, maxlen=n_ctx, padding='post', truncating='post')
+            full_line.extend(subline)
+            full_line.append(101)  # 文章之间添加CLS表示文章结束, 段落之间使用SEP表示段落结束
         with open(tokenized_data_path + 'tokenized_train_{}.txt'.format(i), 'w') as f:
-            for line in new_lines:
-                for id in line[:-1]:
-                    f.write(str(id) + ' ')
-                f.write(str(line[-1]))
-                f.write('\n')
+            for id in full_line[:-1]:
+                f.write(str(id) + ' ')
+            f.write(str(full_line[-1]))
+            f.write('\n')
     print('finish')
 
 
@@ -101,11 +95,17 @@ def main():
         for i in x:
             with open(tokenized_data_path + 'tokenized_train_{}.txt'.format(i), 'r') as f:
                 running_loss = 0
-                sub_lines = f.readlines()
-                sub_lines = [line.split()[:n_ctx] for line in sub_lines]
-                random.shuffle(sub_lines)
-                for step in range(len(sub_lines) // BATCH_SIZE):
-                    batch = sub_lines[step * BATCH_SIZE: (step + 1) * BATCH_SIZE]
+                line = f.read()
+                tokens = line.split()
+                tokens = [int(token) for token in tokens]
+                start_point = 0
+                chunks = []
+                while start_point < len(tokens) - n_ctx:
+                    chunks.append(tokens[start_point: start_point + n_ctx])
+                    start_point += stride
+                random.shuffle(chunks)
+                for step in range(len(chunks) // BATCH_SIZE):
+                    batch = chunks[step * BATCH_SIZE: (step + 1) * BATCH_SIZE]
                     batch_labels = []
                     batch_inputs = []
                     for ids in batch:

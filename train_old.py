@@ -52,12 +52,12 @@ class CorpusDataset(object):
                 sublines = [full_tokenizer.tokenize(line) for line in sublines if len(line) > 128]
                 sublines = [full_tokenizer.convert_tokens_to_ids(line) for line in sublines]
                 for subline in sublines:
-                    new_lines.append(subline[:n_ctx])
+                    new_lines.append(subline[:n_ctx + 1])
                     start_point = stride
-                    while start_point + n_ctx < len(subline) + stride * 2:
-                        new_lines.append(subline[start_point:start_point + n_ctx])
+                    while start_point + n_ctx + 1 < len(subline) + stride * 2:
+                        new_lines.append(subline[start_point:start_point + n_ctx + 1])
                         start_point += stride
-                new_lines = pad_sequences(new_lines, maxlen=n_ctx, padding='post', truncating='post')
+                new_lines = pad_sequences(new_lines, maxlen=n_ctx + 1, padding='post', truncating='post')
                 with open('./data/tokenized/tokenized_train_{}.txt'.format(i), 'w') as f:
                     for line in new_lines:
                         for id in line[:-1]:
@@ -85,20 +85,19 @@ def main():
             with open(tokenized_data_path + 'tokenized_train_{}.txt'.format(i), 'r') as f:
                 running_loss = 0
                 sub_lines = f.readlines()
-                sub_lines = [line.split()[:n_ctx] for line in sub_lines]
+                sub_lines = [line.split()[:n_ctx + 1] for line in sub_lines]
                 random.shuffle(sub_lines)
                 for step in range(len(sub_lines) // BATCH_SIZE):
                     batch = sub_lines[step * BATCH_SIZE: (step + 1) * BATCH_SIZE]
                     batch_labels = []
                     batch_inputs = []
                     for ids in batch:
-                        int_ids_for_labels = [int(x) for x in ids]
-                        int_ids_for_inputs = [101]
-                        int_ids_for_inputs.extend([int(x) for x in ids[:-1]])  # 101 是CLS
+                        int_ids_for_labels = [int(x) for x in ids][1:]
+                        int_ids_for_inputs = [int(x) for x in ids[:-1]]
                         batch_labels.append(int_ids_for_labels)
                         batch_inputs.append(int_ids_for_inputs)
-                    batch_labels = torch.Tensor(batch_labels).long().to(device)
-                    batch_inputs = torch.Tensor(batch_inputs).long().to(device)
+                    batch_labels = torch.tensor(batch_labels).long().to(device)
+                    batch_inputs = torch.tensor(batch_inputs).long().to(device)
 
                     optimizer.zero_grad()
                     loss = model.forward(input_ids=batch_inputs, lm_labels=batch_labels)

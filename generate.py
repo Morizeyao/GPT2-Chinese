@@ -79,6 +79,9 @@ def sample_sequence(model, length, start_token=None, batch_size=None, context=No
             logits = top_filtering(logits)
             logits = logits.squeeze(0)
             log_probs = F.softmax(logits, dim=-1)
+
+            log_probs[100] = 0
+
             if sample:
                 prev = torch.multinomial(log_probs, num_samples=1)
                 prev = prev.unsqueeze(dim=-1)
