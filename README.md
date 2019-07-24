@@ -40,4 +40,5 @@
 ## 生成样例
 
 - 下为斗破苍穹的生成样例，使用约50M参数的GPT2以32Batch Size在16MB斗破苍穹小说内容上训练一小时得到。此处[SEP]表示换行。
-- ![avatar](sample/doupo.jpeg)
+
+![avatar](sample/doupo.jpeg)
