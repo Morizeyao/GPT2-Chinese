@@ -44,7 +44,7 @@ class CorpusDataset(object):
             with open(data_path, 'r') as f:
                 print('reading lines')
                 self.lines = json.load(f)
-                self.lines = [line['c'].replace('\n', ' [SEP] ') for line in self.lines]
+                self.lines = [line.replace('\n', ' [SEP] ') for line in self.lines]
                 self.all_len = len(self.lines)
             for i in tqdm(range(1000)):
                 new_lines = []

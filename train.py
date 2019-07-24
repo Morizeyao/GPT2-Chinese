@@ -39,7 +39,7 @@ def build_files(data_path=RAW_DATA_PATH):
     with open(data_path, 'r') as f:
         print('reading lines')
         lines = json.load(f)
-        lines = [line['c'].replace('\n', ' [SEP] ') for line in lines]  # 用[SEP]表示换行
+        lines = [line.replace('\n', ' [SEP] ') for line in lines]  # 用[SEP]表示换行
         all_len = len(lines)
     for i in tqdm(range(num_pieces)):
         new_lines = []
