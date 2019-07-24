@@ -34,5 +34,9 @@
 
 ## 联系作者
 
- - QQ：330501241
- - Mail：ned1991@gmail.com
+- QQ：330501241
+- Mail：ned1991@gmail.com
+ 
+## 生成样例
+
+- ![avatar](sample/doupo.jpeg)
