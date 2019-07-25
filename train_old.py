@@ -41,7 +41,7 @@ stride = 128
 class CorpusDataset(object):
     def __init__(self, data_path=RAW_DATA_PATH, raw=True):
         if raw:
-            with open(data_path, 'r') as f:
+            with open(data_path, 'r', encoding='utf8') as f:
                 print('reading lines')
                 self.lines = json.load(f)
                 self.lines = [line.replace('\n', ' [SEP] ') for line in self.lines]

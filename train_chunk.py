@@ -35,7 +35,7 @@ num_pieces = 100
 def build_files(data_path=RAW_DATA_PATH):
     if not os.path.exists(tokenized_data_path):
         os.mkdir(tokenized_data_path)
-    with open(data_path, 'r') as f:
+    with open(data_path, 'r', encoding='utf8') as f:
         print('reading lines')
         lines = json.load(f)
         lines = [line.replace('\n', ' [SEP] ') for line in lines]  # 用[SEP]表示换行

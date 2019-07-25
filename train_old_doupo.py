@@ -39,7 +39,7 @@ stride = 128
 
 
 def main():
-    with open(RAW_DATA_PATH), 'r' as f:
+    with open(RAW_DATA_PATH, 'r', encoding='utf8') as f:
         doupo = json.load(f)
         doupo = doupo.replace('\n', ' [SEP] ')
         doupo = full_tokenizer.tokenize(doupo)
