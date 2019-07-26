@@ -100,8 +100,8 @@ def main():
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
-    tokenizer = tokenization_bert.BertTokenizer(vocab_file='cache/vocab.txt')
-    model_config = pytorch_transformers.GPT2Config.from_json_file('model_config.json')
+    tokenizer = tokenization_bert.BertTokenizer(vocab_file='cache/vocab_small.txt')
+    model_config = pytorch_transformers.GPT2Config.from_json_file('config/model_config_small.json')
     model = GPT2LMHeadModel(config=model_config).from_pretrained('model/final_model')
     model.to(device)
     model.eval()

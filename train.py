@@ -10,7 +10,7 @@ from tqdm import tqdm
 from torch.nn import DataParallel
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2,3"
-model_config = pytorch_transformers.modeling_gpt2.GPT2Config.from_json_file('model_config_small.json')
+model_config = pytorch_transformers.modeling_gpt2.GPT2Config.from_json_file('config/model_config_small.json')
 n_ctx = model_config.n_ctx
 full_tokenizer = tokenization_bert.BertTokenizer(vocab_file='cache/vocab_small.txt')
 full_tokenizer.max_len = n_ctx
