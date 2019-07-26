@@ -1,7 +1,7 @@
 import torch
 import torch.nn.functional as F
-from pytorch_transformers import tokenization_bert
 import pytorch_transformers
+from pytorch_transformers import tokenization_bert
 from tqdm import trange
 from pytorch_transformers import GPT2LMHeadModel
 
@@ -92,7 +92,7 @@ def main():
     length = -1
     batch_size = 1
     nsamples = 18
-    temperature = 0.5
+    temperature = 1
     topk = 5
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
