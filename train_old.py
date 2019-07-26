@@ -85,7 +85,7 @@ def main():
             with open(tokenized_data_path + 'tokenized_train_{}.txt'.format(i), 'r') as f:
                 running_loss = 0
                 sub_lines = f.readlines()
-                sub_lines = [line.split()[:n_ctx + 1] for line in sub_lines]
+                sub_lines = [line.split()[:n_ctx] for line in sub_lines]
                 random.shuffle(sub_lines)
                 for step in range(len(sub_lines) // BATCH_SIZE):
                     batch = sub_lines[step * BATCH_SIZE: (step + 1) * BATCH_SIZE]
