@@ -52,12 +52,12 @@ class CorpusDataset(object):
                 sublines = [full_tokenizer.tokenize(line) for line in sublines if len(line) > 128]
                 sublines = [full_tokenizer.convert_tokens_to_ids(line) for line in sublines]
                 for subline in sublines:
-                    new_lines.append(subline[:n_ctx + 1])
+                    new_lines.append(subline[:n_ctx])
                     start_point = stride
-                    while start_point + n_ctx + 1 < len(subline) + stride * 2:
-                        new_lines.append(subline[start_point:start_point + n_ctx + 1])
+                    while start_point + n_ctx < len(subline) + stride * 2:
+                        new_lines.append(subline[start_point:start_point + n_ctx])
                         start_point += stride
-                new_lines = pad_sequences(new_lines, maxlen=n_ctx + 1, padding='post', truncating='post')
+                new_lines = pad_sequences(new_lines, maxlen=n_ctx, padding='post', truncating='post')
                 with open('./data/tokenized/tokenized_train_{}.txt'.format(i), 'w') as f:
                     for line in new_lines:
                         for id in line[:-1]:
