@@ -1,5 +1,4 @@
 import pytorch_pretrained_bert
-from pytorch_pretrained_bert import tokenization
 import torch
 import numpy as np
 import os
@@ -7,6 +6,7 @@ import json
 import re
 import random
 import time
+from my_chinese_tokenizer import tokenization_bert
 from tqdm import tqdm
 from torch.utils.data import Dataset, DataLoader
 from sklearn.model_selection import train_test_split
@@ -16,7 +16,7 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 RAW_DATA_PATH = 'data/train_doupo.txt'
 tokenized_data_path = 'data/tokenized/'
 raw = True  # 是否从零开始构建数据集
-full_tokenizer = tokenization.BertTokenizer.from_pretrained('bert-base-chinese')
+full_tokenizer = tokenization_bert.BertTokenizer.from_pretrained('bert-base-chinese')
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 print('using device:', device)
 model_config = pytorch_pretrained_bert.GPT2Config.from_json_file('model_config.json')
