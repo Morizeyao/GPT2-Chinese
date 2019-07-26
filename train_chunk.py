@@ -1,10 +1,10 @@
 import pytorch_transformers
-from pytorch_transformers import tokenization_bert
 import torch
 import numpy as np
 import os
 import json
 import random
+from my_chinese_tokenizer import tokenization_bert
 from datetime import datetime
 from tqdm import tqdm
 from torch.nn import DataParallel
@@ -63,12 +63,6 @@ def main():
 
     model = pytorch_transformers.modeling_gpt2.GPT2LMHeadModel(config=model_config)
     MULTI_GPU = False
-    if torch.cuda.device_count() > 1:
-        print("Let's use", torch.cuda.device_count(), "GPUs!")
-        model = DataParallel(model)
-        MULTI_GPU = True
-    model.to(device)
-
     total_tokens = 0
     for i in tqdm(range(num_pieces)):
         with open(tokenized_data_path + 'tokenized_train_{}.txt'.format(i), 'r') as f:
@@ -85,6 +79,12 @@ def main():
         except ImportError:
             raise ImportError("Please install apex from https://www.github.com/nvidia/apex to use fp16 training.")
         model, optimizer = amp.initialize(model, optimizer, opt_level=fp16_opt_level)
+
+    if torch.cuda.device_count() > 1:
+        print("Let's use", torch.cuda.device_count(), "GPUs!")
+        model = DataParallel(model)
+        MULTI_GPU = True
+    model.to(device)
     print('starting training')
     for epoch in range(EPOCHS):
         print('epoch {}'.format(epoch))

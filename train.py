@@ -1,10 +1,10 @@
 import pytorch_transformers
-from pytorch_transformers import tokenization_bert
 import torch
 import numpy as np
 import os
 import json
 import random
+from my_chinese_tokenizer import tokenization_bert
 from datetime import datetime
 from tqdm import tqdm
 from torch.nn import DataParallel
@@ -69,11 +69,6 @@ def main():
 
     model = pytorch_transformers.modeling_gpt2.GPT2LMHeadModel(config=model_config)
     MULTI_GPU = False
-    if torch.cuda.device_count() > 1:
-        print("Let's use", torch.cuda.device_count(), "GPUs!")
-        model = DataParallel(model)
-        MULTI_GPU = True
-    model.to(device)
 
     total_lines = 0
     for i in tqdm(range(num_pieces)):
@@ -84,6 +79,12 @@ def main():
     optimizer = pytorch_transformers.AdamW(model.parameters(), lr=LR, correct_bias=True)
     scheduler = pytorch_transformers.WarmupLinearSchedule(optimizer, warmup_steps=WARMUP_STEPS,
                                                           t_total=total_steps)
+
+    if torch.cuda.device_count() > 1:
+        print("Let's use", torch.cuda.device_count(), "GPUs!")
+        model = DataParallel(model)
+        MULTI_GPU = True
+    model.to(device)
     if fp16:
         try:
             from apex import amp
