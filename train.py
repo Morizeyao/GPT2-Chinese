@@ -8,29 +8,28 @@ from my_chinese_tokenizer import tokenization_bert
 from datetime import datetime
 from tqdm import tqdm
 from torch.nn import DataParallel
-from keras.preprocessing.sequence import pad_sequences
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-model_config = pytorch_transformers.modeling_gpt2.GPT2Config.from_json_file('model_config.json')
+os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2,3"
+model_config = pytorch_transformers.modeling_gpt2.GPT2Config.from_json_file('model_config_small.json')
 n_ctx = model_config.n_ctx
-full_tokenizer = tokenization_bert.BertTokenizer(vocab_file='cache/vocab.txt')
+full_tokenizer = tokenization_bert.BertTokenizer(vocab_file='cache/vocab_small.txt')
 full_tokenizer.max_len = n_ctx
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 print('using device:', device)
 
 RAW_DATA_PATH = 'data/train.txt'
-tokenized_data_path = 'data/tokenized/'
+tokenized_data_path = 'data/tokenized_chunk/'
 raw = True  # 是否从零开始构建数据集
 EPOCHS = 5
-BATCH_SIZE = 4
-LR = 2.5e-4
+BATCH_SIZE = 12
+LR = 1.5e-4
 WARMUP_STEPS = 2000
 LOG_STEP = 250
-stride = 128
-fp16 = False
-fp16_opt_level = '01'
+stride = 768
+fp16 = True
+fp16_opt_level = 'O1'
 max_grad_norm = 1.0
-num_pieces = 1000
+num_pieces = 100
 
 
 def build_files(data_path=RAW_DATA_PATH):
@@ -42,58 +41,53 @@ def build_files(data_path=RAW_DATA_PATH):
         lines = [line.replace('\n', ' [SEP] ') for line in lines]  # 用[SEP]表示换行
         all_len = len(lines)
     for i in tqdm(range(num_pieces)):
-        new_lines = []
         sublines = lines[all_len // num_pieces * i: all_len // num_pieces * (i + 1)]
-        sublines = [full_tokenizer.tokenize(line) for line in sublines if len(line) > 128]
+        sublines = [full_tokenizer.tokenize(line) for line in sublines if len(line) > 128]  # 只考虑长度超过128的句子
         sublines = [full_tokenizer.convert_tokens_to_ids(line) for line in sublines]
+        full_line = []
         for subline in sublines:
-            new_lines.append(subline[:n_ctx])
-            start_point = stride
-            while start_point + n_ctx < len(subline) + stride * 2:
-                new_lines.append(subline[start_point:start_point + n_ctx])
-                start_point += stride
-        new_lines = pad_sequences(new_lines, maxlen=n_ctx, padding='post', truncating='post')
+            full_line.extend(subline)
+            full_line.append(101)  # 101是CLS，文章之间添加CLS表示文章结束, 段落之间使用SEP表示段落结束
         with open(tokenized_data_path + 'tokenized_train_{}.txt'.format(i), 'w') as f:
-            for line in new_lines:
-                for id in line[:-1]:
-                    f.write(str(id) + ' ')
-                f.write(str(line[-1]))
-                f.write('\n')
+            for id in full_line[:-1]:
+                f.write(str(id) + ' ')
+            f.write(str(full_line[-1]))
+            f.write('\n')
     print('finish')
 
 
 def main():
     if raw:
         build_files(data_path=RAW_DATA_PATH)
-        exit(1)
 
     model = pytorch_transformers.modeling_gpt2.GPT2LMHeadModel(config=model_config)
     model.to(device)
     MULTI_GPU = False
-
-    total_lines = 0
+    total_tokens = 0
+    print('calculating total steps')
     for i in tqdm(range(num_pieces)):
         with open(tokenized_data_path + 'tokenized_train_{}.txt'.format(i), 'r') as f:
-            total_lines += len(f.readlines())
-    total_steps = int(total_lines * EPOCHS / BATCH_SIZE)
+            total_tokens += len(f.read().split())
+    num_chunks = total_tokens // stride
+    total_steps = int(num_chunks * EPOCHS / BATCH_SIZE)
     print('total steps = {}'.format(total_steps))
     optimizer = pytorch_transformers.AdamW(model.parameters(), lr=LR, correct_bias=True)
     scheduler = pytorch_transformers.WarmupLinearSchedule(optimizer, warmup_steps=WARMUP_STEPS,
                                                           t_total=total_steps)
-
-    if torch.cuda.device_count() > 1:
-        print("Let's use", torch.cuda.device_count(), "GPUs!")
-        model = DataParallel(model)
-        MULTI_GPU = True
     if fp16:
         try:
             from apex import amp
         except ImportError:
             raise ImportError("Please install apex from https://www.github.com/nvidia/apex to use fp16 training.")
         model, optimizer = amp.initialize(model, optimizer, opt_level=fp16_opt_level)
+
+    if torch.cuda.device_count() > 1:
+        print("Let's use", torch.cuda.device_count(), "GPUs!")
+        model = DataParallel(model)
+        MULTI_GPU = True
     print('starting training')
     for epoch in range(EPOCHS):
-        print('epoch {}'.format(epoch))
+        print('epoch {}'.format(epoch + 1))
         now = datetime.now()
         print('time: {}'.format(now))
         x = np.linspace(0, num_pieces - 1, num_pieces, dtype=np.int32)
@@ -102,11 +96,17 @@ def main():
         for i in x:
             with open(tokenized_data_path + 'tokenized_train_{}.txt'.format(i), 'r') as f:
                 running_loss = 0
-                sub_lines = f.readlines()
-                sub_lines = [line.split()[:n_ctx] for line in sub_lines]
-                random.shuffle(sub_lines)
-                for step in range(len(sub_lines) // BATCH_SIZE):
-                    batch = sub_lines[step * BATCH_SIZE: (step + 1) * BATCH_SIZE]
+                line = f.read()
+                tokens = line.split()
+                tokens = [int(token) for token in tokens]
+                start_point = 0
+                chunks = []
+                while start_point < len(tokens) - n_ctx:
+                    chunks.append(tokens[start_point: start_point + n_ctx])
+                    start_point += stride
+                random.shuffle(chunks)
+                for step in range(len(chunks) // BATCH_SIZE):
+                    batch = chunks[step * BATCH_SIZE: (step + 1) * BATCH_SIZE]
                     batch_labels = []
                     batch_inputs = []
                     for ids in batch:
@@ -141,7 +141,7 @@ def main():
                         running_loss = 0
             piece_num += 1
 
-        print('saving model for epoch {}'.format(epoch))
+        print('saving model for epoch {}'.format(epoch + 1))
         if not os.path.exists('./model/model_epoch{}'.format(epoch + 1)):
             os.mkdir('./model/model_epoch{}'.format(epoch + 1))
         model.save_pretrained('./model/model_epoch{}'.format(epoch + 1))
