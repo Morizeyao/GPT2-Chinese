@@ -9,7 +9,7 @@ from datetime import datetime
 from tqdm import tqdm
 from torch.nn import DataParallel
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2,3"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2,3"  # 此处设置程序使用哪些显卡
 model_config = pytorch_transformers.modeling_gpt2.GPT2Config.from_json_file('config/model_config_small.json')
 n_ctx = model_config.n_ctx
 full_tokenizer = tokenization_bert.BertTokenizer(vocab_file='cache/vocab_small.txt')
@@ -17,23 +17,23 @@ full_tokenizer.max_len = n_ctx
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 print('using device:', device)
 
-RAW_DATA_PATH = 'data/train.txt'
+raw_data_path = 'data/train.txt'
 tokenized_data_path = 'data/tokenized_chunk/'
-raw = True  # 是否从零开始构建数据集
-EPOCHS = 5
-BATCH_SIZE = 12
-LR = 1.5e-4
-WARMUP_STEPS = 2000
-LOG_STEP = 250
+raw = True  # 选择是否从零开始构建数据集
+epochs = 5
+batch_size = 12
+lr = 1.5e-4
+warmup_steps = 2000
+log_step = 250
 stride = 768
 gradient_accumulation = 1
-fp16 = True
+fp16 = False  # 不支持半精度的显卡请勿打开
 fp16_opt_level = 'O1'
 max_grad_norm = 1.0
 num_pieces = 100
 
 
-def build_files(data_path=RAW_DATA_PATH):
+def build_files(data_path=raw_data_path):
     if not os.path.exists(tokenized_data_path):
         os.mkdir(tokenized_data_path)
     with open(data_path, 'r', encoding='utf8') as f:
@@ -59,21 +59,21 @@ def build_files(data_path=RAW_DATA_PATH):
 
 def main():
     if raw:
-        build_files(data_path=RAW_DATA_PATH)
+        build_files(data_path=raw_data_path)
 
     model = pytorch_transformers.modeling_gpt2.GPT2LMHeadModel(config=model_config)
     model.to(device)
-    MULTI_GPU = False
+    multi_gpu = False
     total_tokens = 0
     print('calculating total steps')
     for i in tqdm(range(num_pieces)):
         with open(tokenized_data_path + 'tokenized_train_{}.txt'.format(i), 'r') as f:
             total_tokens += len(f.read().split())
     num_chunks = total_tokens // stride
-    total_steps = int(num_chunks * EPOCHS / BATCH_SIZE / gradient_accumulation)
+    total_steps = int(num_chunks * epochs / batch_size / gradient_accumulation)
     print('total steps = {}'.format(total_steps))
-    optimizer = pytorch_transformers.AdamW(model.parameters(), lr=LR, correct_bias=True)
-    scheduler = pytorch_transformers.WarmupLinearSchedule(optimizer, warmup_steps=WARMUP_STEPS,
+    optimizer = pytorch_transformers.AdamW(model.parameters(), lr=lr, correct_bias=True)
+    scheduler = pytorch_transformers.WarmupLinearSchedule(optimizer, warmup_steps=warmup_steps,
                                                           t_total=total_steps)
     if fp16:
         try:
@@ -85,9 +85,9 @@ def main():
     if torch.cuda.device_count() > 1:
         print("Let's use", torch.cuda.device_count(), "GPUs!")
         model = DataParallel(model)
-        MULTI_GPU = True
+        multi_gpu = True
     print('starting training')
-    for epoch in range(EPOCHS):
+    for epoch in range(epochs):
         print('epoch {}'.format(epoch + 1))
         now = datetime.now()
         print('time: {}'.format(now))
@@ -106,8 +106,8 @@ def main():
                     chunks.append(tokens[start_point: start_point + n_ctx])
                     start_point += stride
                 random.shuffle(chunks)
-                for step in range(len(chunks) // BATCH_SIZE):
-                    batch = chunks[step * BATCH_SIZE: (step + 1) * BATCH_SIZE]
+                for step in range(len(chunks) // batch_size):
+                    batch = chunks[step * batch_size: (step + 1) * batch_size]
                     batch_labels = []
                     batch_inputs = []
                     for ids in batch:
@@ -122,7 +122,7 @@ def main():
                     outputs = model.forward(input_ids=batch_inputs, labels=batch_labels)
                     loss, logits = outputs[:2]
 
-                    if MULTI_GPU:
+                    if multi_gpu:
                         loss = loss.mean()
                     if gradient_accumulation > 1:
                         loss = loss / gradient_accumulation
@@ -138,11 +138,11 @@ def main():
                         running_loss += loss.item()
                         scheduler.step()
                         optimizer.step()
-                        if (step + 1) % LOG_STEP == 0:
+                        if (step + 1) % log_step == 0:
                             print('step {} of piece {} of epoch {}, loss {}'.format(
                                 (step + 1) // gradient_accumulation,
                                 piece_num, epoch + 1,
-                                running_loss / (LOG_STEP // gradient_accumulation)))
+                                running_loss / (log_step // gradient_accumulation)))
                             running_loss = 0
             piece_num += 1
 
