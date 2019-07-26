@@ -119,8 +119,6 @@ def main():
                         batch_inputs.append(int_ids_for_inputs)
                     batch_labels = torch.tensor(batch_labels).long().to(device)
                     batch_inputs = torch.tensor(batch_inputs).long().to(device)
-
-                    optimizer.zero_grad()
                     outputs = model.forward(input_ids=batch_inputs, labels=batch_labels)
                     loss, logits = outputs[:2]
 
@@ -128,18 +126,18 @@ def main():
                         loss = loss.mean()
                     if gradient_accumulation > 1:
                         loss = loss / gradient_accumulation
+                    if fp16:
+                        with amp.scale_loss(loss, optimizer) as scaled_loss:
+                            scaled_loss.backward()
+                        torch.nn.utils.clip_grad_norm_(amp.master_params(optimizer), max_grad_norm)
+                    else:
+                        loss.backward()
+                        torch.nn.utils.clip_grad_norm_(model.parameters(), max_grad_norm)
                     if (step + 1) % gradient_accumulation == 0:
-                        if fp16:
-                            with amp.scale_loss(loss, optimizer) as scaled_loss:
-                                scaled_loss.backward()
-                            torch.nn.utils.clip_grad_norm_(amp.master_params(optimizer), max_grad_norm)
-                        else:
-                            loss.backward()
-                            torch.nn.utils.clip_grad_norm_(model.parameters(), max_grad_norm)
-
                         running_loss += loss.item()
                         scheduler.step()
                         optimizer.step()
+                        optimizer.zero_grad()
                         if (step + 1) % log_step == 0:
                             print('step {} of piece {} of epoch {}, loss {}'.format(
                                 (step + 1) // gradient_accumulation,

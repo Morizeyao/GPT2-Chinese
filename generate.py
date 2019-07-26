@@ -1,9 +1,12 @@
 import torch
 import torch.nn.functional as F
 import pytorch_transformers
+import os
 from pytorch_transformers import tokenization_bert
 from tqdm import trange
 from pytorch_transformers import GPT2LMHeadModel
+
+os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2,3"  # 此处设置程序使用哪些显卡
 
 
 def top_k_logits(logits, k):
@@ -18,6 +21,7 @@ def top_k_logits(logits, k):
         values = torch.topk(logits, k)[0]
         batch_mins = values[:, -1].view(-1, 1).expand_as(logits)
         return torch.where(logits < batch_mins, torch.ones_like(logits) * -1e10, logits)
+
 
 def top_filtering(logits, top_k=5, top_p=0.9, threshold=-float('Inf'), filter_value=-float('Inf')):
     """ Filter a distribution of logits using top-k, top-p (nucleus) and/or threshold filtering
