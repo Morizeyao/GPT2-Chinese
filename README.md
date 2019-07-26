@@ -2,7 +2,7 @@
 
 ## UPDATE Jul 27
 
-- 我对项目做了一次更新，
+- 我对项目做了一次更新整理。27日之前的内容，以及训练斗破苍穹的脚本可以查看old_jul_27 branch，之后不做更新。
 
 ## 项目状态
 
@@ -17,10 +17,7 @@
 ## 文件结构
 
 - generate.py 与 train.py 分别是生成与训练的脚本，使用pytorch-transformers库。
-- generate_old.py 与 train_old.py 是旧版的生成与训练脚本，使用pytorch-pretrained-bert库。
 - cache/vocab_small.txt 与 model_config_small.json 是我目前试验性缩小Bert tokenizer词表大小从而缩小模型大小的产物。
-- train_old_doupo.py 是专用于训练斗破苍穹语料的脚本
-- train_chunk.py 是我目前试验性的新生成训练数据方法。
 
 ## 注意
 
