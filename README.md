@@ -2,11 +2,11 @@
 
 ## UPDATE Jul 27
 
-- 为了保持项目的干净整洁，我做了一次更新清理。27日之前的内容以及训练斗破苍穹的脚本可以查看old_jul_27的branch，之后不做更新。
+- 为了保持项目的干净整洁，我做了一次更新清理。27日之前的内容以及训练斗破苍穹的脚本可以查看old_jul_27的Branch，之后不做更新。
 
 ## 项目状态
 
-- 目前项目处于积极开发状态，如发现任何bug或是有功能意见与改进欢迎提交issue，PR或是联系作者。
+- 目前项目处于积极开发状态，如发现任何bug或是有功能意见与改进欢迎提交Issue，PR或是联系作者。
 
 ## 使用方法
 
@@ -32,9 +32,10 @@
 - 可以从[这里](https://github.com/brightmart/nlp_chinese_corpus)与[这里](http://thuctc.thunlp.org/#获取链接)下载。
 - 斗破苍穹语料可以从[这里](https://github.com/GaoPeng97/transformer-xl-chinese/tree/master/data/doupo)下载。
 
-## FP16支持
+## FP16与Gradient Accumulation支持
 
-我在train.py文件中加入了fp16支持，如果你安装了apex的话并且知道fp16是什么的话，可以修改变量fp61=True来启用。
+- 我在train.py文件中加入了fp16支持，如果你安装了apex的话并且知道fp16是什么的话，可以修改变量fp61=True来启用。
+- 我在train.py文件中加入了gradient accumulation支持，如果你需要更大的batch size的话可以调整gradient_accumulation的值。实际batch size会是文件中batch size与gradient accumulation值的乘积。
 
 ## 联系作者
 

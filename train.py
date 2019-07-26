@@ -26,6 +26,7 @@ LR = 1.5e-4
 WARMUP_STEPS = 2000
 LOG_STEP = 250
 stride = 768
+gradient_accumulation = 1
 fp16 = True
 fp16_opt_level = 'O1'
 max_grad_norm = 1.0
@@ -69,7 +70,7 @@ def main():
         with open(tokenized_data_path + 'tokenized_train_{}.txt'.format(i), 'r') as f:
             total_tokens += len(f.read().split())
     num_chunks = total_tokens // stride
-    total_steps = int(num_chunks * EPOCHS / BATCH_SIZE)
+    total_steps = int(num_chunks * EPOCHS / BATCH_SIZE / gradient_accumulation)
     print('total steps = {}'.format(total_steps))
     optimizer = pytorch_transformers.AdamW(model.parameters(), lr=LR, correct_bias=True)
     scheduler = pytorch_transformers.WarmupLinearSchedule(optimizer, warmup_steps=WARMUP_STEPS,
@@ -93,8 +94,8 @@ def main():
         x = np.linspace(0, num_pieces - 1, num_pieces, dtype=np.int32)
         random.shuffle(x)
         piece_num = 0
-        for i in x:
-            with open(tokenized_data_path + 'tokenized_train_{}.txt'.format(i), 'r') as f:
+        for i, j in enumerate(x):
+            with open(tokenized_data_path + 'tokenized_train_{}.txt'.format(j), 'r') as f:
                 running_loss = 0
                 line = f.read()
                 tokens = line.split()
@@ -123,22 +124,26 @@ def main():
 
                     if MULTI_GPU:
                         loss = loss.mean()
+                    if gradient_accumulation > 1:
+                        loss = loss / gradient_accumulation
+                    if (step + 1) % gradient_accumulation == 0:
+                        if fp16:
+                            with amp.scale_loss(loss, optimizer) as scaled_loss:
+                                scaled_loss.backward()
+                            torch.nn.utils.clip_grad_norm_(amp.master_params(optimizer), max_grad_norm)
+                        else:
+                            loss.backward()
+                            torch.nn.utils.clip_grad_norm_(model.parameters(), max_grad_norm)
 
-                    if fp16:
-                        with amp.scale_loss(loss, optimizer) as scaled_loss:
-                            scaled_loss.backward()
-                        torch.nn.utils.clip_grad_norm_(amp.master_params(optimizer), max_grad_norm)
-                    else:
-                        loss.backward()
-                        torch.nn.utils.clip_grad_norm_(model.parameters(), max_grad_norm)
-
-                    running_loss += loss.item()
-                    scheduler.step()
-                    optimizer.step()
-                    if (step + 1) % LOG_STEP == 0:
-                        print('step {} of piece {} of epoch {}, loss {}'.format(step + 1, piece_num, epoch + 1,
-                                                                                running_loss / LOG_STEP))
-                        running_loss = 0
+                        running_loss += loss.item()
+                        scheduler.step()
+                        optimizer.step()
+                        if (step + 1) % LOG_STEP == 0:
+                            print('step {} of piece {} of epoch {}, loss {}'.format(
+                                (step + 1) // gradient_accumulation,
+                                piece_num, epoch + 1,
+                                running_loss / (LOG_STEP // gradient_accumulation)))
+                            running_loss = 0
             piece_num += 1
 
         print('saving model for epoch {}'.format(epoch + 1))
