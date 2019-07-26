@@ -59,7 +59,9 @@ def build_files(data_path=raw_data_path):
 
 def main():
     if raw:
+        print('building files')
         build_files(data_path=raw_data_path)
+        print('files built')
 
     model = pytorch_transformers.modeling_gpt2.GPT2LMHeadModel(config=model_config)
     model.to(device)
