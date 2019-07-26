@@ -9,10 +9,10 @@ from datetime import datetime
 from tqdm import tqdm
 from torch.nn import DataParallel
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-model_config = pytorch_transformers.modeling_gpt2.GPT2Config.from_json_file('model_config.json')
+os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2,3"
+model_config = pytorch_transformers.modeling_gpt2.GPT2Config.from_json_file('model_config_small.json')
 n_ctx = model_config.n_ctx
-full_tokenizer = tokenization_bert.BertTokenizer(vocab_file='cache/vocab.txt')
+full_tokenizer = tokenization_bert.BertTokenizer(vocab_file='cache/vocab_small.txt')
 full_tokenizer.max_len = n_ctx
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 print('using device:', device)
@@ -21,13 +21,13 @@ RAW_DATA_PATH = 'data/train.txt'
 tokenized_data_path = 'data/tokenized_chunk/'
 raw = True  # 是否从零开始构建数据集
 EPOCHS = 5
-BATCH_SIZE = 4
-LR = 2.5e-4
+BATCH_SIZE = 12
+LR = 1.5e-4
 WARMUP_STEPS = 2000
 LOG_STEP = 250
-stride = 256
-fp16 = False
-fp16_opt_level = '01'
+stride = 768
+fp16 = True
+fp16_opt_level = 'O1'
 max_grad_norm = 1.0
 num_pieces = 100
 
@@ -59,11 +59,12 @@ def build_files(data_path=RAW_DATA_PATH):
 def main():
     if raw:
         build_files(data_path=RAW_DATA_PATH)
-        exit(1)
 
     model = pytorch_transformers.modeling_gpt2.GPT2LMHeadModel(config=model_config)
+    model.to(device)
     MULTI_GPU = False
     total_tokens = 0
+    print('calculating total steps')
     for i in tqdm(range(num_pieces)):
         with open(tokenized_data_path + 'tokenized_train_{}.txt'.format(i), 'r') as f:
             total_tokens += len(f.read().split())
@@ -84,10 +85,9 @@ def main():
         print("Let's use", torch.cuda.device_count(), "GPUs!")
         model = DataParallel(model)
         MULTI_GPU = True
-    model.to(device)
     print('starting training')
     for epoch in range(EPOCHS):
-        print('epoch {}'.format(epoch))
+        print('epoch {}'.format(epoch + 1))
         now = datetime.now()
         print('time: {}'.format(now))
         x = np.linspace(0, num_pieces - 1, num_pieces, dtype=np.int32)
@@ -141,7 +141,7 @@ def main():
                         running_loss = 0
             piece_num += 1
 
-        print('saving model for epoch {}'.format(epoch))
+        print('saving model for epoch {}'.format(epoch + 1))
         if not os.path.exists('./model/model_epoch{}'.format(epoch + 1)):
             os.mkdir('./model/model_epoch{}'.format(epoch + 1))
         model.save_pretrained('./model/model_epoch{}'.format(epoch + 1))

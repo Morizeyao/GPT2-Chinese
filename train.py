@@ -68,6 +68,7 @@ def main():
         exit(1)
 
     model = pytorch_transformers.modeling_gpt2.GPT2LMHeadModel(config=model_config)
+    model.to(device)
     MULTI_GPU = False
 
     total_lines = 0
@@ -84,7 +85,6 @@ def main():
         print("Let's use", torch.cuda.device_count(), "GPUs!")
         model = DataParallel(model)
         MULTI_GPU = True
-    model.to(device)
     if fp16:
         try:
             from apex import amp
