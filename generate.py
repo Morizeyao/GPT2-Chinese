@@ -76,8 +76,8 @@ def sample_sequence(model, length, start_token=None, batch_size=None, context=No
         for _ in trange(length):
             logits, past = model(prev, past=past)
             logits = logits[:, -1, :] / temperature
-            logits = top_filtering(logits)
             logits = logits.squeeze(0)
+            logits = top_filtering(logits)
             log_probs = F.softmax(logits, dim=-1)
 
             # log_probs[100] = 0
