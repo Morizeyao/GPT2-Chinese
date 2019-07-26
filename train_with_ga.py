@@ -26,6 +26,7 @@ lr = 1.5e-4
 warmup_steps = 2000
 log_step = 250
 stride = 768
+gradient_accumulation = 1
 fp16 = False  # 不支持半精度的显卡请勿打开
 fp16_opt_level = 'O1'
 max_grad_norm = 1.0
@@ -71,7 +72,7 @@ def main():
         with open(tokenized_data_path + 'tokenized_train_{}.txt'.format(i), 'r') as f:
             total_tokens += len(f.read().split())
     num_chunks = total_tokens // stride
-    total_steps = int(num_chunks * epochs / batch_size)
+    total_steps = int(num_chunks * epochs / batch_size / gradient_accumulation)
     print('total steps = {}'.format(total_steps))
     optimizer = pytorch_transformers.AdamW(model.parameters(), lr=lr, correct_bias=True)
     scheduler = pytorch_transformers.WarmupLinearSchedule(optimizer, warmup_steps=warmup_steps,
@@ -123,6 +124,8 @@ def main():
 
                     if multi_gpu:
                         loss = loss.mean()
+                    if gradient_accumulation > 1:
+                        loss = loss / gradient_accumulation
                     if fp16:
                         with amp.scale_loss(loss, optimizer) as scaled_loss:
                             scaled_loss.backward()
@@ -130,16 +133,17 @@ def main():
                     else:
                         loss.backward()
                         torch.nn.utils.clip_grad_norm_(model.parameters(), max_grad_norm)
-                    running_loss += loss.item()
-                    scheduler.step()
-                    optimizer.step()
-                    optimizer.zero_grad()
-                    if (step + 1) % log_step == 0:
-                        print('step {} of piece {} of epoch {}, loss {}'.format(
-                            (step + 1),
-                            piece_num, epoch + 1,
-                            running_loss / log_step))
-                        running_loss = 0
+                    if (step + 1) % gradient_accumulation == 0:
+                        running_loss += loss.item()
+                        scheduler.step()
+                        optimizer.step()
+                        optimizer.zero_grad()
+                        if (step + 1) % log_step == 0:
+                            print('step {} of piece {} of epoch {}, loss {}'.format(
+                                (step + 1) // gradient_accumulation,
+                                piece_num, epoch + 1,
+                                running_loss / (log_step // gradient_accumulation)))
+                            running_loss = 0
             piece_num += 1
 
         print('saving model for epoch {}'.format(epoch + 1))
