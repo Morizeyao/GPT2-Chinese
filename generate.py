@@ -1,8 +1,5 @@
-import argparse
-import logging
 import torch
 import torch.nn.functional as F
-import numpy as np
 from pytorch_transformers import tokenization_bert
 import pytorch_transformers
 from tqdm import trange
@@ -92,11 +89,11 @@ def sample_sequence(model, length, start_token=None, batch_size=None, context=No
 
 
 def main():
-    LENGTH = -1
-    BATCH_SIZE = 1
-    NSAMPLES = 18
-    TEMPERATURE = 0.5
-    TOPK = 5
+    length = -1
+    batch_size = 1
+    nsamples = 18
+    temperature = 0.5
+    topk = 5
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -106,9 +103,9 @@ def main():
     model.to(device)
     model.eval()
 
-    if LENGTH == -1:
-        LENGTH = model.config.n_ctx // 2
-    elif LENGTH > model.config.n_ctx:
+    if length == -1:
+        length = model.config.n_ctx // 2
+    elif length > model.config.n_ctx:
         raise ValueError("Can't get samples longer than window size: %s" % model.config.n_ctx)
 
     while True:
@@ -118,16 +115,16 @@ def main():
             raw_text = input("Model prompt >>> ")
         context_tokens = tokenizer.convert_tokens_to_ids(tokenizer.tokenize(raw_text))
         generated = 0
-        for _ in range(NSAMPLES // BATCH_SIZE):
+        for _ in range(nsamples // batch_size):
             out = sample_sequence(
-                model=model, length=LENGTH,
+                model=model, length=length,
                 context=context_tokens,
                 start_token=None,
-                batch_size=BATCH_SIZE,
-                temperature=TEMPERATURE, top_k=TOPK, device=device
+                batch_size=batch_size,
+                temperature=temperature, top_k=topk, device=device
             )
             out = out[:, len(context_tokens):].tolist()
-            for i in range(BATCH_SIZE):
+            for i in range(batch_size):
                 generated += 1
                 text = tokenizer.convert_ids_to_tokens(out[i])
                 print("=" * 40 + " SAMPLE " + str(generated) + " " + "=" * 40)
