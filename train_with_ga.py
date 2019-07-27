@@ -134,18 +134,9 @@ def main():
 
                     #  loss backward
                     if fp16:
-                        if (step + 1) % gradient_accumulation == 0:
-                            # Every iters_to_accumulate iterations, unscale and step
-                            with amp.scale_loss(loss, optimizer) as scaled_loss:
-                                scaled_loss.backward()
-                            # Gradient clipping if desired:
+                        with amp.scale_loss(loss, optimizer) as scaled_loss:
+                            scaled_loss.backward()
                             torch.nn.utils.clip_grad_norm_(amp.master_params(optimizer), max_grad_norm)
-                            for param in amp.master_params(optimizer):
-                                param.grad.div_(gradient_accumulation)
-                        else:
-                            with amp.scale_loss(loss, optimizer) as scaled_loss:
-                                scaled_loss.backward()
-                                torch.nn.utils.clip_grad_norm_(amp.master_params(optimizer), max_grad_norm)
                     else:
                         loss.backward()
                         torch.nn.utils.clip_grad_norm_(model.parameters(), max_grad_norm)
@@ -160,7 +151,7 @@ def main():
                             print('step {} of piece {} of epoch {}, loss {}'.format(
                                 (step + 1) // gradient_accumulation,
                                 piece_num, epoch + 1,
-                                running_loss / (log_step // gradient_accumulation)))
+                                running_loss / log_step))
                             running_loss = 0
             piece_num += 1
 
