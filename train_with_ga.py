@@ -127,9 +127,18 @@ def main():
                     if gradient_accumulation > 1:
                         loss = loss / gradient_accumulation
                     if fp16:
-                        with amp.scale_loss(loss, optimizer) as scaled_loss:
-                            scaled_loss.backward()
-                        torch.nn.utils.clip_grad_norm_(amp.master_params(optimizer), max_grad_norm)
+                        if (step + 1) % gradient_accumulation == 0:
+                            # Every iters_to_accumulate iterations, unscale and step
+                            with amp.scale_loss(loss, optimizer) as scaled_loss:
+                                scaled_loss.backward()
+                            # Gradient clipping if desired:
+                            torch.nn.utils.clip_grad_norm_(amp.master_params(optimizer), max_grad_norm)
+                            for param in amp.master_params(optimizer):
+                                param.grad.div_(gradient_accumulation)
+                        else:
+                            with amp.scale_loss(loss, optimizer) as scaled_loss:
+                                scaled_loss.backward()
+                                torch.nn.utils.clip_grad_norm_(amp.master_params(optimizer), max_grad_norm)
                     else:
                         loss.backward()
                         torch.nn.utils.clip_grad_norm_(model.parameters(), max_grad_norm)
