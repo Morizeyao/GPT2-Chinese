@@ -147,12 +147,12 @@ def main():
                         scheduler.step()
                         optimizer.step()
                         optimizer.zero_grad()
-                        if (step + 1) % log_step == 0:
-                            print('step {} of piece {} of epoch {}, loss {}'.format(
-                                (step + 1) // gradient_accumulation,
-                                piece_num, epoch + 1,
-                                running_loss * gradient_accumulation / log_step))
-                            running_loss = 0
+                    if (step + 1) % log_step == 0:
+                        print('step {} of piece {} of epoch {}, loss {}'.format(
+                            (step + 1) // gradient_accumulation,
+                            piece_num, epoch + 1,
+                            running_loss * gradient_accumulation / log_step))
+                        running_loss = 0
             piece_num += 1
 
         print('saving model for epoch {}'.format(epoch + 1))
