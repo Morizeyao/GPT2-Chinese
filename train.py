@@ -108,6 +108,8 @@ def main():
                     start_point += stride
                 random.shuffle(chunks)
                 for step in range(len(chunks) // batch_size):
+
+                    #  prepare data
                     batch = chunks[step * batch_size: (step + 1) * batch_size]
                     batch_labels = []
                     batch_inputs = []
@@ -118,11 +120,16 @@ def main():
                         batch_inputs.append(int_ids_for_inputs)
                     batch_labels = torch.tensor(batch_labels).long().to(device)
                     batch_inputs = torch.tensor(batch_inputs).long().to(device)
-                    outputs = model.forward(input_ids=batch_inputs, labels=batch_labels)
-                    loss, logits = outputs[:2]
 
+                    #  forward pass
+                    outputs = model.forward(input_ids=batch_inputs, labels=batch_labels)
+
+                    #  calculate loss
+                    loss, logits = outputs[:2]
                     if multi_gpu:
                         loss = loss.mean()
+
+                    #  calculate gradient
                     if fp16:
                         with amp.scale_loss(loss, optimizer) as scaled_loss:
                             scaled_loss.backward()
@@ -131,6 +138,8 @@ def main():
                         loss.backward()
                         torch.nn.utils.clip_grad_norm_(model.parameters(), max_grad_norm)
                     running_loss += loss.item()
+
+                    #  step optimizer
                     scheduler.step()
                     optimizer.step()
                     optimizer.zero_grad()

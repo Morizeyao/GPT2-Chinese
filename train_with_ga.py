@@ -109,6 +109,8 @@ def main():
                     start_point += stride
                 random.shuffle(chunks)
                 for step in range(len(chunks) // batch_size):
+
+                    #  prepare data
                     batch = chunks[step * batch_size: (step + 1) * batch_size]
                     batch_labels = []
                     batch_inputs = []
@@ -119,13 +121,18 @@ def main():
                         batch_inputs.append(int_ids_for_inputs)
                     batch_labels = torch.tensor(batch_labels).long().to(device)
                     batch_inputs = torch.tensor(batch_inputs).long().to(device)
+
+                    #  forward pass
                     outputs = model.forward(input_ids=batch_inputs, labels=batch_labels)
                     loss, logits = outputs[:2]
 
+                    #  get loss
                     if multi_gpu:
                         loss = loss.mean()
                     if gradient_accumulation > 1:
                         loss = loss / gradient_accumulation
+
+                    #  loss backward
                     if fp16:
                         if (step + 1) % gradient_accumulation == 0:
                             # Every iters_to_accumulate iterations, unscale and step
@@ -142,6 +149,8 @@ def main():
                     else:
                         loss.backward()
                         torch.nn.utils.clip_grad_norm_(model.parameters(), max_grad_norm)
+
+                    #  optimizer step
                     if (step + 1) % gradient_accumulation == 0:
                         running_loss += loss.item()
                         scheduler.step()
