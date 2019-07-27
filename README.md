@@ -23,8 +23,8 @@
 
 - pytorch-pretrained-bert现在已经改名为pytorch-transformers了，我已经将train.py更新，适应新的版本，旧版本的train.py更名为train_old.py，不再更新。
 - 该训练代码可以运行，近期我会进行模型运算。
-- train.txt如果太大的话内存会不足。例如若是训练语料有8个GB，那么在64GB内存的Linux机器上直接跑是跑不通的，所以我写了一个拆分一千份的代码来做预处理。
-- 如果你的内存非常大（比如你有512GB内存）或者语料较小的话，可以改掉train.py内42行之后build files内的对应代码，不做拆分直接预处理语料。
+- train.txt如果太大的话内存会不足。例如若是训练语料有8个GB，那么在64GB内存的Linux机器上直接跑是跑不通的，所以我写了一个拆分一百份的代码来做预处理。
+- 如果你的内存非常大或者语料较小的话，可以改掉train.py内build files内的对应代码，不做拆分直接预处理语料。
 - 各位如果完成了预训练的话欢迎进行交流。
 
 ## 语料
@@ -35,7 +35,7 @@
 ## FP16与Gradient Accumulation支持
 
 - 我在train.py文件中加入了fp16支持，如果你安装了apex的话并且知道fp16是什么的话，可以修改变量fp61=True来启用。
-- 我在train.py文件中加入了gradient accumulation支持，如果你需要更大的batch size的话可以调整gradient_accumulation的值。实际batch size会是文件中batch size与gradient accumulation值的乘积。
+- 我在train_with_ga.py文件中加入了gradient accumulation支持，如果你需要更大的batch size的话可以调整gradient_accumulation的值。实际batch size会是文件中batch size与gradient accumulation值的乘积。
 
 ## 联系作者
 
