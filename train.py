@@ -151,7 +151,7 @@ def main():
                             print('step {} of piece {} of epoch {}, loss {}'.format(
                                 (step + 1) // gradient_accumulation,
                                 piece_num, epoch + 1,
-                                running_loss / log_step))
+                                running_loss * gradient_accumulation / log_step))
                             running_loss = 0
             piece_num += 1
 
