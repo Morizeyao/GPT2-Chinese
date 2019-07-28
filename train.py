@@ -18,7 +18,7 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 print('using device:', device)
 
 raw_data_path = 'data/train.txt'
-tokenized_data_path = 'data/tokenized/'
+tokenized_data_path = 'data/tokenized'
 raw = True  # 选择是否从零开始构建数据集
 epochs = 5
 batch_size = 12
@@ -158,7 +158,8 @@ def main():
         print('saving model for epoch {}'.format(epoch + 1))
         if not os.path.exists('./model/model_epoch{}'.format(epoch + 1)):
             os.mkdir('./model/model_epoch{}'.format(epoch + 1))
-        model.save_pretrained('./model/model_epoch{}'.format(epoch + 1))
+        model_to_save = model.module if hasattr(model, 'module') else model
+        model_to_save.save_pretrained('./model/model_epoch{}'.format(epoch + 1))
         torch.save(scheduler.state_dict(), './model/model_epoch{}/scheduler.pt'.format(epoch + 1))
         torch.save(optimizer.state_dict(), './model/model_epoch{}/optimizer.pt'.format(epoch + 1))
         print('epoch {} finished'.format(epoch + 1))
@@ -170,7 +171,8 @@ def main():
     print('training finished')
     if not os.path.exists('./model/final_model'):
         os.mkdir('./model/final_model')
-    model.save_pretrained('./model/final_model')
+    model_to_save = model.module if hasattr(model, 'module') else model
+    model_to_save.save_pretrained('./model/final_model')
     torch.save(scheduler.state_dict(), './model/final_model/scheduler.pt')
     torch.save(optimizer.state_dict(), './model/final_model/optimizer.pt')
 
