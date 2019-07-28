@@ -143,7 +143,7 @@ def main():
                     print('step {} of epoch {}, loss {}'.format(
                         (step + 1) // gradient_accumulation,
                         epoch + 1,
-                        running_loss * gradient_accumulation / log_step))
+                        running_loss * gradient_accumulation**2 / log_step))
                     running_loss = 0
 
         print('saving model for epoch {}'.format(epoch + 1))

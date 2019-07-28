@@ -2,7 +2,7 @@ import torch
 import torch.nn.functional as F
 import pytorch_transformers
 import os
-from pytorch_transformers import tokenization_bert
+from my_chinese_tokenizer import tokenization_bert
 from tqdm import trange
 from pytorch_transformers import GPT2LMHeadModel
 
