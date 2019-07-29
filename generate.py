@@ -113,10 +113,7 @@ def main():
         raise ValueError("Can't get samples longer than window size: %s" % model.config.n_ctx)
 
     while True:
-        raw_text = input("Model prompt >>> ")
-        while not raw_text:
-            print('Prompt should not be empty!')
-            raw_text = input("Model prompt >>> ")
+        raw_text = '萧炎'
         context_tokens = tokenizer.convert_tokens_to_ids(tokenizer.tokenize(raw_text))
         generated = 0
         for _ in range(nsamples // batch_size):
@@ -132,7 +129,7 @@ def main():
                 generated += 1
                 text = tokenizer.convert_ids_to_tokens(out[i])
                 print("=" * 40 + " SAMPLE " + str(generated) + " " + "=" * 40)
-                print(text)
+                print(''.join(text))
         print("=" * 80)
 
 
