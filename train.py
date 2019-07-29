@@ -50,10 +50,8 @@ def build_files(data_path=raw_data_path):
             full_line.extend(subline)
             full_line.append(101)  # 101是CLS，文章之间添加CLS表示文章结束, 段落之间使用SEP表示段落结束
         with open(tokenized_data_path + 'tokenized_train_{}.txt'.format(i), 'w') as f:
-            for id in full_line[:-1]:
+            for id in full_line:
                 f.write(str(id) + ' ')
-            f.write(str(full_line[-1]))
-            f.write('\n')
     print('finish')
 
 
@@ -71,6 +69,7 @@ def main():
     for i in tqdm(range(num_pieces)):
         with open(tokenized_data_path + 'tokenized_train_{}.txt'.format(i), 'r') as f:
             full_line += f.read()
+    full_line = full_line.strip()
     full_line = [int(item) for item in full_line.split()]
     len_full_line = len(full_line)
     samples = []
