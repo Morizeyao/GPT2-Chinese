@@ -66,7 +66,6 @@ def main():
     model = pytorch_transformers.modeling_gpt2.GPT2LMHeadModel(config=model_config)
     model.to(device)
     multi_gpu = False
-    total_tokens = 0
     full_line = ''
     print('calculating total steps')
     for i in tqdm(range(num_pieces)):
