@@ -19,7 +19,7 @@ print('using device:', device)
 
 raw_data_path = 'data/train.txt'
 tokenized_data_path = 'data/tokenized/'
-raw = False  # 选择是否从零开始构建数据集
+raw = True  # 选择是否从零开始构建数据集
 epochs = 5
 batch_size = 12
 lr = 1.5e-4
