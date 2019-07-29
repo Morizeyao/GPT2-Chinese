@@ -47,6 +47,7 @@ def build_files(data_path=raw_data_path):
         sublines = [full_tokenizer.convert_tokens_to_ids(line) for line in sublines]
         full_line = []
         for subline in sublines:
+            full_line.append(103)  # 103是MASK，表示文章开始
             full_line.extend(subline)
             full_line.append(101)  # 101是CLS，文章之间添加CLS表示文章结束, 段落之间使用SEP表示段落结束
         with open(tokenized_data_path + 'tokenized_train_{}.txt'.format(i), 'w') as f:
