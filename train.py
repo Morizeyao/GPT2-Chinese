@@ -39,7 +39,7 @@ def build_files(data_path=raw_data_path):
     with open(data_path, 'r', encoding='utf8') as f:
         print('reading lines')
         lines = json.load(f)
-        lines = [line.replace('\n', ' [SEP] ') for line in lines]  # 用[SEP]表示换行
+        lines = [line.replace('\n', ' [SEP] ') for line in lines]  # 用[SEP]表示换行, 段落之间使用SEP表示段落结束
         all_len = len(lines)
     for i in tqdm(range(num_pieces)):
         sublines = lines[all_len // num_pieces * i: all_len // num_pieces * (i + 1)]
@@ -49,7 +49,7 @@ def build_files(data_path=raw_data_path):
         for subline in sublines:
             full_line.append(103)  # 103是MASK，表示文章开始
             full_line.extend(subline)
-            full_line.append(101)  # 101是CLS，文章之间添加CLS表示文章结束, 段落之间使用SEP表示段落结束
+            full_line.append(101)  # 101是CLS，文章之间添加CLS表示文章结束
         with open(tokenized_data_path + 'tokenized_train_{}.txt'.format(i), 'w') as f:
             for id in full_line:
                 f.write(str(id) + ' ')

@@ -1,5 +1,5 @@
 pytorch-transformers
-pytorch_pretrained_bert
+pytorch-pretrained-bert
 torch
 numpy
 tqdm
