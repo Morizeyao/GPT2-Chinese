@@ -10,7 +10,7 @@
 
 ## 使用方法
 
-- 在项目根目录建立data文件夹。将训练语料以train.txt为名放入data目录中。train.txt里是一个json，json是一个列表，列表的每个元素都分别是一篇要训练的文章。
+- 在项目根目录建立data文件夹。将训练语料以train.json为名放入data目录中。train.json里是一个json，json是一个列表，列表的每个元素都分别是一篇要训练的文章。
 - 运行train.py文件，会自动预处理数据。
 - 预处理完成之后，将train.py文件内的raw改成False，然后运行，即可开始训练。
 

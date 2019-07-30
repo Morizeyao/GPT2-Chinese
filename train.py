@@ -16,7 +16,7 @@ full_tokenizer.max_len = n_ctx
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 print('using device:', device)
 
-raw_data_path = 'data/train.txt'
+raw_data_path = 'data/train.json'
 tokenized_data_path = 'data/tokenized/'
 raw = True  # 选择是否从零开始构建数据集
 epochs = 5
