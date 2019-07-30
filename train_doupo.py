@@ -1,12 +1,10 @@
 import pytorch_transformers
 import torch
-import numpy as np
 import os
 import json
 import random
-from my_chinese_tokenizer import tokenization_bert
+import tokenization_bert
 from datetime import datetime
-from tqdm import tqdm
 from torch.nn import DataParallel
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2,3"  # 此处设置程序使用哪些显卡

@@ -1,10 +1,9 @@
 import pytorch_transformers
 import torch
-import numpy as np
 import os
 import json
 import random
-from my_chinese_tokenizer import tokenization_bert
+import tokenization_bert
 from datetime import datetime
 from tqdm import tqdm
 from torch.nn import DataParallel
@@ -31,6 +30,7 @@ fp16 = False  # 不支持半精度的显卡请勿打开
 fp16_opt_level = 'O1'
 max_grad_norm = 1.0
 num_pieces = 100
+output_dir = 'model/'
 
 
 def build_files(data_path=raw_data_path):
@@ -148,12 +148,12 @@ def main():
                 running_loss = 0
 
         print('saving model for epoch {}'.format(epoch + 1))
-        if not os.path.exists('./model/model_epoch{}'.format(epoch + 1)):
-            os.mkdir('./model/model_epoch{}'.format(epoch + 1))
+        if not os.path.exists(output_dir + 'model_epoch{}'.format(epoch + 1)):
+            os.mkdir(output_dir + 'model_epoch{}'.format(epoch + 1))
         model_to_save = model.module if hasattr(model, 'module') else model
-        model_to_save.save_pretrained('./model/model_epoch{}'.format(epoch + 1))
-        torch.save(scheduler.state_dict(), './model/model_epoch{}/scheduler.pt'.format(epoch + 1))
-        torch.save(optimizer.state_dict(), './model/model_epoch{}/optimizer.pt'.format(epoch + 1))
+        model_to_save.save_pretrained(output_dir + 'model_epoch{}'.format(epoch + 1))
+        # torch.save(scheduler.state_dict(), output_dir + 'model_epoch{}/scheduler.pt'.format(epoch + 1))
+        # torch.save(optimizer.state_dict(), output_dir + 'model_epoch{}/optimizer.pt'.format(epoch + 1))
         print('epoch {} finished'.format(epoch + 1))
 
         then = datetime.now()
@@ -161,12 +161,12 @@ def main():
         print('time for one epoch: {}'.format(then - now))
 
     print('training finished')
-    if not os.path.exists('./model/final_model'):
-        os.mkdir('./model/final_model')
+    if not os.path.exists(output_dir + 'final_model'):
+        os.mkdir(output_dir + 'final_model')
     model_to_save = model.module if hasattr(model, 'module') else model
-    model_to_save.save_pretrained('./model/final_model')
-    torch.save(scheduler.state_dict(), './model/final_model/scheduler.pt')
-    torch.save(optimizer.state_dict(), './model/final_model/optimizer.pt')
+    model_to_save.save_pretrained(output_dir + 'final_model')
+    # torch.save(scheduler.state_dict(), output_dir + 'final_model/scheduler.pt')
+    # torch.save(optimizer.state_dict(), output_dir + 'final_model/optimizer.pt')
 
 
 if __name__ == '__main__':
