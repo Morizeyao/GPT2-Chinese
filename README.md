@@ -23,7 +23,7 @@
 
 - pytorch-pretrained-bert现在已经改名为pytorch-transformers了，我已经将train.py更新，适应新的版本，旧版本的train.py更名为train_old.py，不再更新。
 - 该训练代码可以运行，近期我会进行模型运算。
-- train.txt如果太大的话内存会不足。所以我写了一个拆分若干份的代码来做预处理。
+- train.json如果太大的话内存会不足。所以我写了一个拆分若干份的代码来做预处理。
 - 如果你的内存非常大或者语料较小的话，可以改掉train.py内build files内的对应代码，不做拆分直接预处理语料。
 - 各位如果完成了预训练的话欢迎进行交流。
 
