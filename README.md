@@ -34,8 +34,7 @@
 
 ## FP16与Gradient Accumulation支持
 
-- 我在train.py文件中加入了fp16支持，如果你安装了apex的话并且知道fp16是什么的话，可以修改变量fp61=True来启用。
-- 我在train_with_ga.py文件中加入了gradient accumulation支持，如果你需要更大的batch size的话可以调整gradient_accumulation的值。实际batch size会是文件中batch size与gradient accumulation值的乘积。
+- 我在train.py文件中加入了fp16与gradient accumulation支持，如果你安装了apex的话并且知道fp16是什么的话，可以修改变量fp61=True来启用。
 
 ## 联系作者
 
