@@ -4,6 +4,7 @@ import os
 import json
 import random
 import tokenization_bert
+import numpy as np
 from datetime import datetime
 from tqdm import tqdm
 from torch.nn import DataParallel
@@ -64,21 +65,20 @@ def main():
 
     model = pytorch_transformers.modeling_gpt2.GPT2LMHeadModel(config=model_config)
     model.to(device)
+
+    num_parameters = 0
+    parameters = model.parameters()
+    for parameter in parameters:
+        num_parameters += parameter.numel()
+    print('number of parameters: {}'.format(num_parameters))
+
     multi_gpu = False
-    full_line = ''
+    full_len = 0
     print('calculating total steps')
     for i in tqdm(range(num_pieces)):
         with open(tokenized_data_path + 'tokenized_train_{}.txt'.format(i), 'r') as f:
-            full_line += f.read()
-    full_line = full_line.strip()
-    full_line = [int(item) for item in full_line.split()]
-    len_full_line = len(full_line)
-    samples = []
-    start_point = 0
-    while start_point + n_ctx < len_full_line:
-        samples.append(full_line[start_point:start_point+n_ctx])
-        start_point += stride
-    total_steps = int(len(samples) * epochs / batch_size / gradient_accumulation)
+            full_len += len([int(item) for item in f.read().strip().split()])
+    total_steps = int(full_len / stride * epochs / batch_size / gradient_accumulation)
     print('total steps = {}'.format(total_steps))
     optimizer = pytorch_transformers.AdamW(model.parameters(), lr=lr, correct_bias=True)
     scheduler = pytorch_transformers.WarmupLinearSchedule(optimizer, warmup_steps=warmup_steps,
@@ -99,53 +99,68 @@ def main():
         print('epoch {}'.format(epoch + 1))
         now = datetime.now()
         print('time: {}'.format(now))
-        running_loss = 0
-        random.shuffle(samples)
-        for step in range(len(samples) // batch_size):
+        x = np.linspace(0, num_pieces - 1, num_pieces, dtype=np.int32)
+        random.shuffle(x)
+        piece_num = 0
+        for i in x:
+            running_loss = 0
+            with open(tokenized_data_path + 'tokenized_train_{}.txt'.format(i), 'r') as f:
+                line = f.read().strip()
+            tokens = line.split()
+            tokens = [int(token) for token in tokens]
+            start_point = 0
+            samples = []
+            while start_point < len(tokens) - n_ctx:
+                samples.append(tokens[start_point: start_point + n_ctx])
+                start_point += stride
+            random.shuffle(samples)
+            for step in range(len(samples) // batch_size):
 
-            #  prepare data
-            batch = samples[step * batch_size: (step + 1) * batch_size]
-            batch_labels = []
-            batch_inputs = []
-            for ids in batch:
-                int_ids_for_labels = [int(x) for x in ids]
-                int_ids_for_inputs = [int(x) for x in ids]
-                batch_labels.append(int_ids_for_labels)
-                batch_inputs.append(int_ids_for_inputs)
-            batch_labels = torch.tensor(batch_labels).long().to(device)
-            batch_inputs = torch.tensor(batch_inputs).long().to(device)
+                #  prepare data
+                batch = samples[step * batch_size: (step + 1) * batch_size]
+                batch_labels = []
+                batch_inputs = []
+                for ids in batch:
+                    int_ids_for_labels = [int(x) for x in ids]
+                    int_ids_for_inputs = [int(x) for x in ids]
+                    batch_labels.append(int_ids_for_labels)
+                    batch_inputs.append(int_ids_for_inputs)
+                batch_labels = torch.tensor(batch_labels).long().to(device)
+                batch_inputs = torch.tensor(batch_inputs).long().to(device)
 
-            #  forward pass
-            outputs = model.forward(input_ids=batch_inputs, labels=batch_labels)
-            loss, logits = outputs[:2]
+                #  forward pass
+                outputs = model.forward(input_ids=batch_inputs, labels=batch_labels)
+                loss, logits = outputs[:2]
 
-            #  get loss
-            if multi_gpu:
-                loss = loss.mean()
-            if gradient_accumulation > 1:
-                loss = loss / gradient_accumulation
+                #  get loss
+                if multi_gpu:
+                    loss = loss.mean()
+                if gradient_accumulation > 1:
+                    loss = loss / gradient_accumulation
 
-            #  loss backward
-            if fp16:
-                with amp.scale_loss(loss, optimizer) as scaled_loss:
-                    scaled_loss.backward()
-                    torch.nn.utils.clip_grad_norm_(amp.master_params(optimizer), max_grad_norm)
-            else:
-                loss.backward()
-                torch.nn.utils.clip_grad_norm_(model.parameters(), max_grad_norm)
+                #  loss backward
+                if fp16:
+                    with amp.scale_loss(loss, optimizer) as scaled_loss:
+                        scaled_loss.backward()
+                        torch.nn.utils.clip_grad_norm_(amp.master_params(optimizer), max_grad_norm)
+                else:
+                    loss.backward()
+                    torch.nn.utils.clip_grad_norm_(model.parameters(), max_grad_norm)
 
-            #  optimizer step
-            if (step + 1) % gradient_accumulation == 0:
-                running_loss += loss.item()
-                scheduler.step()
-                optimizer.step()
-                optimizer.zero_grad()
-            if (step + 1) % log_step == 0:
-                print('step {} of epoch {}, loss {}'.format(
-                    (step + 1) // gradient_accumulation,
-                    epoch + 1,
-                    running_loss * gradient_accumulation**2 / log_step))
-                running_loss = 0
+                #  optimizer step
+                if (step + 1) % gradient_accumulation == 0:
+                    running_loss += loss.item()
+                    scheduler.step()
+                    optimizer.step()
+                    optimizer.zero_grad()
+                if (step + 1) % log_step == 0:
+                    print('step {} of piece {} of epoch {}, loss {}'.format(
+                        (step + 1) // gradient_accumulation,
+                        piece_num,
+                        epoch + 1,
+                        running_loss * gradient_accumulation / log_step))
+                    running_loss = 0
+            piece_num += 1
 
         print('saving model for epoch {}'.format(epoch + 1))
         if not os.path.exists(output_dir + 'model_epoch{}'.format(epoch + 1)):

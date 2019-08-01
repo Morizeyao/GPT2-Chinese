@@ -15,7 +15,7 @@ full_tokenizer.max_len = n_ctx
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 print('using device:', device)
 
-raw_data_path = 'data/train_doupo.josn'
+raw_data_path = 'data/train_doupo.json'
 tokenized_data_path = 'data/tokenized_doupo/'
 raw = True  # 选择是否从零开始构建数据集
 epochs = 30
@@ -144,7 +144,7 @@ def main():
                 print('step {} of epoch {}, loss {}'.format(
                     (step + 1) // gradient_accumulation,
                     epoch + 1,
-                    running_loss * gradient_accumulation ** 2 / log_step))
+                    running_loss * gradient_accumulation / log_step))
                 running_loss = 0
 
         print('saving model for epoch {}'.format(epoch + 1))
@@ -152,8 +152,8 @@ def main():
             os.mkdir('./model/model_epoch{}'.format(epoch + 1))
         model_to_save = model.module if hasattr(model, 'module') else model
         model_to_save.save_pretrained('./model/model_epoch{}'.format(epoch + 1))
-        torch.save(scheduler.state_dict(), './model/model_epoch{}/scheduler.pt'.format(epoch + 1))
-        torch.save(optimizer.state_dict(), './model/model_epoch{}/optimizer.pt'.format(epoch + 1))
+        # torch.save(scheduler.state_dict(), './model/model_epoch{}/scheduler.pt'.format(epoch + 1))
+        # torch.save(optimizer.state_dict(), './model/model_epoch{}/optimizer.pt'.format(epoch + 1))
         print('epoch {} finished'.format(epoch + 1))
 
         then = datetime.now()
@@ -165,8 +165,8 @@ def main():
         os.mkdir('./model/final_model')
     model_to_save = model.module if hasattr(model, 'module') else model
     model_to_save.save_pretrained('./model/final_model')
-    torch.save(scheduler.state_dict(), './model/final_model/scheduler.pt')
-    torch.save(optimizer.state_dict(), './model/final_model/optimizer.pt')
+    # torch.save(scheduler.state_dict(), './model/final_model/scheduler.pt')
+    # torch.save(optimizer.state_dict(), './model/final_model/optimizer.pt')
 
 
 if __name__ == '__main__':
