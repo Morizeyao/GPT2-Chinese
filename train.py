@@ -154,7 +154,9 @@ def main():
                     optimizer.step()
                     optimizer.zero_grad()
                 if (step + 1) % log_step == 0:
-                    print('step {} of piece {} of epoch {}, loss {}'.format(
+                    print('now time: {}:{}. Step {} of piece {} of epoch {}, loss {}'.format(
+                        datetime.now().hour,
+                        datetime.now().minute,
                         (step + 1) // gradient_accumulation,
                         piece_num,
                         epoch + 1,
