@@ -106,7 +106,7 @@ def main():
     model = GPT2LMHeadModel(config=model_config).from_pretrained('model/final_model')  # 设置模型地址
     model.to(device)
     model.eval()
-    titles = '萧炎'  # 这里写一个列表，里面每个元素是一个生成的标题
+    titles = ['萧炎']  # 这里写一个列表，里面每个元素是一个生成的标题
     articles_per_title = 10  # 这里定义一个标题生成多少篇文章
     save_path = 'generated/'  # 设置存到哪
 
