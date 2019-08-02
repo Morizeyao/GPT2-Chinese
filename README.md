@@ -24,11 +24,9 @@
 ## 注意
 
 - pytorch-pretrained-bert现在已经改名为pytorch-transformers了，我已经将train.py更新，适应新的版本，旧版本的train.py更名为train_old.py，不再更新。
-- 该训练代码可以运行，近期我会进行模型运算。
-- train.json如果太大的话内存会不足。所以我写了一个拆分若干份的代码来做预处理。
+- 模型因商业原因无法公布，需自行运算。各位如果完成了预训练的话欢迎进行交流。
 - 如果你的内存非常大或者语料较小的话，可以改掉train.py内build files内的对应代码，不做拆分直接预处理语料。
-- 各位如果完成了预训练的话欢迎进行交流。
-
+- 
 ## 语料
 
 - 可以从[这里](https://github.com/brightmart/nlp_chinese_corpus)与[这里](http://thuctc.thunlp.org/#获取链接)下载。
