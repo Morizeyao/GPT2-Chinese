@@ -5,36 +5,13 @@ import json
 import random
 import tokenization_bert
 import numpy as np
+import argparse
 from datetime import datetime
 from tqdm import tqdm
 from torch.nn import DataParallel
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2,3"  # 此处设置程序使用哪些显卡
-model_config = pytorch_transformers.modeling_gpt2.GPT2Config.from_json_file('config/model_config_small.json')
-n_ctx = model_config.n_ctx
-full_tokenizer = tokenization_bert.BertTokenizer(vocab_file='cache/vocab_small.txt')
-full_tokenizer.max_len = n_ctx
-device = 'cuda' if torch.cuda.is_available() else 'cpu'
-print('using device:', device)
 
-raw_data_path = 'data/train.json'
-tokenized_data_path = 'data/tokenized/'
-raw = True  # 选择是否从零开始构建数据集
-epochs = 5
-batch_size = 12
-lr = 1.5e-4
-warmup_steps = 2000
-log_step = 1
-stride = 768
-gradient_accumulation = 1
-fp16 = False  # 不支持半精度的显卡请勿打开
-fp16_opt_level = 'O1'
-max_grad_norm = 1.0
-num_pieces = 100
-output_dir = 'model/'
-
-
-def build_files(data_path=raw_data_path):
+def build_files(data_path, tokenized_data_path, num_pieces, full_tokenizer):
     if not os.path.exists(tokenized_data_path):
         os.mkdir(tokenized_data_path)
     with open(data_path, 'r', encoding='utf8') as f:
@@ -58,9 +35,56 @@ def build_files(data_path=raw_data_path):
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--device', default='1,2,3,4', type=str, required=False)
+    parser.add_argument('--model_config', default='config/model_config_small.json', type=str, required=False)
+    parser.add_argument('--tokenizer_path', default='cache/vocab_small.txt', type=str, required=False)
+    parser.add_argument('--raw_data_path', default='data/train.json', type=str, required=False)
+    parser.add_argument('--tokenized_data_path', default='data/tokenized', type=str, required=False)
+    parser.add_argument('--raw', action='store_true')
+    parser.add_argument('--epochs', default=5, type=int, required=False)
+    parser.add_argument('--batch_size', default=8, type=int, required=False)
+    parser.add_argument('--lr', default=1.5e-4, type=float, required=False)
+    parser.add_argument('--warmup_steps', default=2000, type=int, required=False)
+    parser.add_argument('--log_step', default=1, type=int, required=False)
+    parser.add_argument('--stride', default=768, type=int, required=False)
+    parser.add_argument('--gradient_accumulation', default=1, type=str, required=False)
+    parser.add_argument('--fp16', action='store_true')
+    parser.add_argument('--fp16_opt_level', default='O1', type=str, required=False)
+    parser.add_argument('--max_grad_norm', default=1.0, type=float, required=False)
+    parser.add_argument('--num_pieces', default=100, type=int, required=False)
+    parser.add_argument('--output_dir', default='model/', type=str, required=False)
+    args = parser.parse_args()
+    print(args)
+
+    os.environ["CUDA_VISIBLE_DEVICES"] = args.device  # 此处设置程序使用哪些显卡
+    model_config = pytorch_transformers.modeling_gpt2.GPT2Config.from_json_file(args.model_config)
+    n_ctx = model_config.n_ctx
+    full_tokenizer = tokenization_bert.BertTokenizer(vocab_file=args.tokenizer_path)
+    full_tokenizer.max_len = n_ctx
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    print('using device:', device)
+
+    raw_data_path = args.raw_data_path
+    tokenized_data_path = args.tokenized_data_path
+    raw = args.raw  # 选择是否从零开始构建数据集
+    epochs = args.epochs
+    batch_size = args.batch_size
+    lr = args.lr
+    warmup_steps = args.warmup_steps
+    log_step = args.log_step
+    stride = args.stride
+    gradient_accumulation = args.gradient_accumulation
+    fp16 = args.fp16  # 不支持半精度的显卡请勿打开
+    fp16_opt_level = args.fp16_opt_level
+    max_grad_norm = args.max_grad_norm
+    num_pieces = args.num_pieces
+    output_dir = args.output_dir
+
     if raw:
         print('building files')
-        build_files(data_path=raw_data_path)
+        build_files(data_path=raw_data_path, tokenized_data_path=tokenized_data_path, num_pieces=num_pieces,
+                    full_tokenizer=full_tokenizer)
         print('files built')
 
     model = pytorch_transformers.modeling_gpt2.GPT2LMHeadModel(config=model_config)

@@ -3,107 +3,122 @@ import torch.nn.functional as F
 import pytorch_transformers
 import os
 import tokenization_bert
+import argparse
 from tqdm import trange
 from pytorch_transformers import GPT2LMHeadModel
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2,3"  # 此处设置程序使用哪些显卡
 
+def _is_chinese_char(char):
+    """Checks whether CP is the codepoint of a CJK character."""
+    # This defines a "chinese character" as anything in the CJK Unicode block:
+    #   https://en.wikipedia.org/wiki/CJK_Unified_Ideographs_(Unicode_block)
+    #
+    # Note that the CJK Unicode block is NOT all Japanese and Korean characters,
+    # despite its name. The modern Korean Hangul alphabet is a different block,
+    # as is Japanese Hiragana and Katakana. Those alphabets are used to write
+    # space-separated words, so they are not treated specially and handled
+    # like the all of the other languages.
+    cp = ord(char)
+    if ((cp >= 0x4E00 and cp <= 0x9FFF) or  #
+            (cp >= 0x3400 and cp <= 0x4DBF) or  #
+            (cp >= 0x20000 and cp <= 0x2A6DF) or  #
+            (cp >= 0x2A700 and cp <= 0x2B73F) or  #
+            (cp >= 0x2B740 and cp <= 0x2B81F) or  #
+            (cp >= 0x2B820 and cp <= 0x2CEAF) or
+            (cp >= 0xF900 and cp <= 0xFAFF) or  #
+            (cp >= 0x2F800 and cp <= 0x2FA1F)):  #
+        return True
 
-def top_k_logits(logits, k):
-    """
-    Masks everything but the k top entries as -infinity (1e10).
-    Used to mask logits such that e^-infinity -> 0 won't contribute to the
-    sum of the denominator.
-    """
-    if k == 0:
-        return logits
-    else:
-        values = torch.topk(logits, k)[0]
-        batch_mins = values[:, -1].view(-1, 1).expand_as(logits)
-        return torch.where(logits < batch_mins, torch.ones_like(logits) * -1e10, logits)
+    return False
 
-
-def top_filtering(logits, top_k=5, top_p=0.9, threshold=-float('Inf'), filter_value=-float('Inf')):
-    """ Filter a distribution of logits using top-k, top-p (nucleus) and/or threshold filtering
+def top_k_top_p_filtering(logits, top_k=0, top_p=0.0, filter_value=-float('Inf')):
+    """ Filter a distribution of logits using top-k and/or nucleus (top-p) filtering
         Args:
             logits: logits distribution shape (vocabulary size)
-            top_k: <=0: no filtering, >0: keep only top k tokens with highest probability.
-            top_p: <=0.0: no filtering, >0.0: keep only a subset S of candidates, where S is the smallest subset
-                whose total probability mass is greater than or equal to the threshold top_p.
-                In practice, we select the highest probability tokens whose cumulative probability mass exceeds
-                the threshold top_p.
-            threshold: a minimal threshold to keep logits
+            top_k > 0: keep only top k tokens with highest probability (top-k filtering).
+            top_p > 0.0: keep the top tokens with cumulative probability >= top_p (nucleus filtering).
+                Nucleus filtering is described in Holtzman et al. (http://arxiv.org/abs/1904.09751)
+        From: https://gist.github.com/thomwolf/1a5a29f6962089e871b94cbd09daf317
     """
-    assert logits.dim() == 1  # Only work for batch size 1 for now - could update but it would obfuscate a bit the code
-    top_k = min(top_k, logits.size(-1))
+    assert logits.dim() == 1  # batch size 1 for now - could be updated for more but the code would be less clear
+    top_k = min(top_k, logits.size(-1))  # Safety check
     if top_k > 0:
-        # Remove all tokens with a probability less than the last token in the top-k tokens
+        # Remove all tokens with a probability less than the last token of the top-k
         indices_to_remove = logits < torch.topk(logits, top_k)[0][..., -1, None]
         logits[indices_to_remove] = filter_value
 
     if top_p > 0.0:
-        # Compute cumulative probabilities of sorted tokens
         sorted_logits, sorted_indices = torch.sort(logits, descending=True)
-        cumulative_probabilities = torch.cumsum(F.softmax(sorted_logits, dim=-1), dim=-1)
+        cumulative_probs = torch.cumsum(F.softmax(sorted_logits, dim=-1), dim=-1)
 
         # Remove tokens with cumulative probability above the threshold
-        sorted_indices_to_remove = cumulative_probabilities > top_p
+        sorted_indices_to_remove = cumulative_probs > top_p
         # Shift the indices to the right to keep also the first token above the threshold
         sorted_indices_to_remove[..., 1:] = sorted_indices_to_remove[..., :-1].clone()
         sorted_indices_to_remove[..., 0] = 0
 
-        # Back to unsorted indices and set them to -infinity
         indices_to_remove = sorted_indices[sorted_indices_to_remove]
         logits[indices_to_remove] = filter_value
-
-    indices_to_remove = logits < threshold
-    logits[indices_to_remove] = filter_value
-
     return logits
 
 
-def sample_sequence(model, length, start_token=None, batch_size=None, context=None, temperature=1.0, top_k=0,
-                    device='cuda', sample=True):
-    if start_token is None:
-        assert context is not None, 'Specify exactly one of start_token and context!'
-        context = torch.tensor(context, device=device, dtype=torch.long).unsqueeze(0).repeat(batch_size, 1)
-    else:
-        assert context is None, 'Specify exactly one of start_token and context!'
-        context = torch.full((batch_size, 1), start_token, device=device, dtype=torch.long)
-    prev = context
-    output = context
-    past = None
+def sample_sequence(model, length, context, num_samples=1, temperature=1, top_k=0, top_p=0.0, is_xlnet=False,
+                    device='cpu'):
+    context = torch.tensor(context, dtype=torch.long, device=device)
+    context = context.unsqueeze(0).repeat(num_samples, 1)
+    generated = context
     with torch.no_grad():
         for _ in trange(length):
-            logits, past = model(prev, past=past)
-            logits = logits[:, -1, :] / temperature
-            logits = logits.squeeze(0)
-            logits = top_filtering(logits)
-            log_probs = F.softmax(logits, dim=-1)
 
-            # log_probs[100] = 0
+            inputs = {'input_ids': generated}
+            if is_xlnet:
+                # XLNet is a direct (predict same token, not next token) and bi-directional model by default
+                # => need one additional dummy token in the input (will be masked), attention mask and target mapping (see model docstring)
+                input_ids = torch.cat((generated, torch.zeros((1, 1), dtype=torch.long, device=device)), dim=1)
+                perm_mask = torch.zeros((1, input_ids.shape[1], input_ids.shape[1]), dtype=torch.float, device=device)
+                perm_mask[:, :, -1] = 1.0  # Previous tokens don't see last token
+                target_mapping = torch.zeros((1, 1, input_ids.shape[1]), dtype=torch.float, device=device)
+                target_mapping[0, 0, -1] = 1.0  # predict last token
+                inputs = {'input_ids': input_ids, 'perm_mask': perm_mask, 'target_mapping': target_mapping}
 
-            if sample:
-                prev = torch.multinomial(log_probs, num_samples=1)
-                prev = prev.unsqueeze(dim=-1)
-            else:
-                _, prev = torch.topk(log_probs, k=1, dim=-1)
-            output = torch.cat((output, prev), dim=1)
-    return output
+            outputs = model(
+                **inputs)  # Note: we could also use 'past' with GPT-2/Transfo-XL/XLNet (cached hidden-states)
+            next_token_logits = outputs[0][0, -1, :] / temperature
+            filtered_logits = top_k_top_p_filtering(next_token_logits, top_k=top_k, top_p=top_p)
+            next_token = torch.multinomial(F.softmax(filtered_logits, dim=-1), num_samples=1)
+            generated = torch.cat((generated, next_token.unsqueeze(0)), dim=1)
+    return generated
 
 
 def main():
-    length = -1
-    batch_size = 1
-    nsamples = 18
-    temperature = 1
-    topk = 5
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--device', default='1,2,3,4', type=str, required=False)
+    parser.add_argument('--length', default=-1, type=int, required=False)
+    parser.add_argument('--batch_size', default=1, type=int, required=False)
+    parser.add_argument('--nsamples', default=10, type=int, required=False)
+    parser.add_argument('--temperature', default=1, type=float, required=False)
+    parser.add_argument('--topk', default=8, type=int, required=False)
+    parser.add_argument('--topp', default=0, type=float, required=False)
+    parser.add_argument('--model_config', default='config/model_config_small.json', type=str, required=False)
+    parser.add_argument('--tokenizer_path', default='cache/vocab_small.txt', type=str, required=False)
+    parser.add_argument('--model_path', default='model/final_model', type=str, required=False)
+
+    args = parser.parse_args()
+    print(args)
+
+    os.environ["CUDA_VISIBLE_DEVICES"] = args.device  # 此处设置程序使用哪些显卡
+    length = args.length
+    batch_size = args.batch_size
+    nsamples = args.nsamples
+    temperature = args.temperature
+    topk = args.topk
+    topp = args.topp
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
-    tokenizer = tokenization_bert.BertTokenizer(vocab_file='cache/vocab_small.txt')
-    model_config = pytorch_transformers.GPT2Config.from_json_file('config/model_config_small.json')
-    model = GPT2LMHeadModel(config=model_config).from_pretrained('model/final_model')
+    tokenizer = tokenization_bert.BertTokenizer(vocab_file=args.tokenizer_path)
+    model_config = pytorch_transformers.GPT2Config.from_json_file(args.model_config)
+    model = GPT2LMHeadModel(config=model_config).from_pretrained(args.model_path)
     model.to(device)
     model.eval()
 
@@ -120,16 +135,20 @@ def main():
             out = sample_sequence(
                 model=model, length=length,
                 context=context_tokens,
-                start_token=None,
-                batch_size=batch_size,
-                temperature=temperature, top_k=topk, device=device
+                temperature=temperature, top_k=topk, top_p=topp, device=device
             )
-            out = out[:, len(context_tokens):].tolist()
+            out = out.tolist()
             for i in range(batch_size):
                 generated += 1
-                text = tokenizer.convert_ids_to_tokens(out[i])
+                text = tokenizer.convert_ids_to_tokens(out[0])
+                for i, item in enumerate(text):
+                    if item == '[MASK]':
+                        text[i] = ''
+                    if item == '[CLS]' or item == '[SEP]':
+                        text[i] = '\n'
                 print("=" * 40 + " SAMPLE " + str(generated) + " " + "=" * 40)
-                print(''.join(text).replace('##', '').strip())
+                text = ''.join(text).replace('##', '').strip()
+                print(text)
         print("=" * 80)
 
 
