@@ -9,22 +9,6 @@ from pytorch_transformers import GPT2LMHeadModel
 os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2,3"  # 此处设置程序使用哪些显卡
 
 
-temperature = 1
-topk = 5
-
-
-device = "cuda" if torch.cuda.is_available() else "cpu"
-
-tokenizer = tokenization_bert.BertTokenizer(vocab_file='cache/vocab_small.txt')
-model_config = pytorch_transformers.GPT2Config.from_json_file('config/model_config_small.json')
-model = GPT2LMHeadModel(config=model_config).from_pretrained('model/final_model')
-model.to(device)
-model.eval()
-raw_text = '萧炎'
-save_path = 'generated/'
-
-if not os.path.exists(save_path):
-    os.mkdir(save_path)
 
 def top_k_logits(logits, k):
     """
@@ -110,38 +94,54 @@ def sample_sequence(model, length, start_token=None, batch_size=None, context=No
 
 
 def main():
-
-    length = -1
     batch_size = 1
+    length = -1  # 设置生成多长
+    temperature = 1
+    topk = 5
 
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+
+    tokenizer = tokenization_bert.BertTokenizer(vocab_file='cache/vocab_small.txt')
+    model_config = pytorch_transformers.GPT2Config.from_json_file('config/model_config_small.json')
+    model = GPT2LMHeadModel(config=model_config).from_pretrained('model/final_model')  # 设置模型地址
+    model.to(device)
+    model.eval()
+    titles = '萧炎'  # 这里写一个列表，里面每个元素是一个生成的标题
+    articles_per_title = 10  # 这里定义一个标题生成多少篇文章
+    save_path = 'generated/'  # 设置存到哪
+
+    if not os.path.exists(save_path):
+        os.mkdir(save_path)
     if length == -1:
         length = model.config.n_ctx // 2
     elif length > model.config.n_ctx:
         raise ValueError("Can't get samples longer than window size: %s" % model.config.n_ctx)
 
-    for i in range(100):
-        with open(save_path + str(i), 'w') as f:
-            context_tokens = tokenizer.convert_tokens_to_ids(tokenizer.tokenize(raw_text))
-            generated = 0
-            out = sample_sequence(
-                model=model, length=length,
-                context=context_tokens,
-                start_token=None,
-                batch_size=batch_size,
-                temperature=temperature, top_k=topk, device=device
-            )
-            out = out[:, len(context_tokens):].tolist()
-            generated += 1
-            text : list= tokenizer.convert_ids_to_tokens(out[0])
-            for i, item in enumerate(text):
-                if item == '[MASK]':
-                    text[i] = ''
-                if item == '[CLS]' or item == '[SEP]':
-                    text[i] = '\n'
+    for i, title in enumerate(titles):
+        for j in range(articles_per_title):
+            with open(save_path + str(i * j), 'w') as f:
+                context_tokens = tokenizer.convert_tokens_to_ids(tokenizer.tokenize(title))
+                generated = 0
+                out = sample_sequence(
+                    model=model, length=length,
+                    context=context_tokens,
+                    start_token=None,
+                    batch_size=batch_size,
+                    temperature=temperature, top_k=topk, device=device
+                )
+                out = out.tolist()
+                generated += 1
+                text = tokenizer.convert_ids_to_tokens(out[0])
+                for i, item in enumerate(text):
+                    if item == '[MASK]':
+                        text[i] = ''
+                    if item == '[CLS]' or item == '[SEP]':
+                        text[i] = '\n'
 
-            print("=" * 40 + " SAMPLE " + str(generated) + " " + "=" * 40)
-            print(''.join(text))
-            print("=" * 80)
+                print("=" * 40 + " SAMPLE " + str(generated) + " " + "=" * 40)
+                print(''.join(text))
+                f.write(text)
+                print("=" * 80)
 
 
 if __name__ == '__main__':
