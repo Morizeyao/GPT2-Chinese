@@ -51,3 +51,16 @@
 - 下为体育新闻的生成样例，使用约50M参数的GPT2以12Batch Size在约300MB体育新闻内容上训练得到。此处[SEP]表示换行，[CLS]表示新的文章，d表示数字。
 
 ![avatar](sample/tiyu.jpg)
+
+## Citing
+
+```
+@misc{GPT2-Chinese,
+  author = {Zeyao Du},
+  title = {GPT2-Chinese: Tools for training GPT2 model in Chinese language},
+  year = {2019},
+  publisher = {GitHub},
+  journal = {GitHub repository},
+  howpublished = {\url{https://github.com/Morizeyao/GPT2-Chinese}},
+}
+```
