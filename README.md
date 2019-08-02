@@ -35,7 +35,7 @@
 
 ## FP16与Gradient Accumulation支持
 
-- 我在train.py文件中加入了fp16与gradient accumulation支持，如果你安装了apex的话并且知道fp16是什么的话，可以修改变量fp61=True来启用。
+- 我在train.py文件中加入了fp16与gradient accumulation支持，如果你安装了apex并且知道fp16是什么的话，可以修改变量fp16=True来启用。
 
 ## 联系作者
 
