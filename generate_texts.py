@@ -139,7 +139,8 @@ def main():
                         text[i] = '\n'
 
                 print("=" * 40 + " SAMPLE " + str(generated) + " " + "=" * 40)
-                print(''.join(text))
+                text = ''.join(text).replace('##', '').strip()
+                print(text)
                 f.write(text)
                 print("=" * 80)
 

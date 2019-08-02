@@ -129,7 +129,7 @@ def main():
                 generated += 1
                 text = tokenizer.convert_ids_to_tokens(out[i])
                 print("=" * 40 + " SAMPLE " + str(generated) + " " + "=" * 40)
-                print(''.join(text))
+                print(''.join(text).replace('##', '').strip())
         print("=" * 80)
 
 
