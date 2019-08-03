@@ -108,6 +108,7 @@ def main():
     parser.add_argument('--save_path', default='generated/', type=str, required=False)
     parser.add_argument('--articles_per_title', default=5, type=int, required=False)
     parser.add_argument('--titles', default='萧炎', type=str, required=False)
+    parser.add_argument('--titles_file', default='', type=str, required=False)
 
     args = parser.parse_args()
     print(args)
@@ -120,6 +121,9 @@ def main():
     topk = args.topk
     topp = args.topp
     titles = args.title.split()  # 列表，里面每个元素是一个生成的标题
+    if args.titles_file:
+        with open(args.titles_file, 'r') as f:
+            titles = [line.strip('\n') for line in f.readlines()]
     articles_per_title = args.articles_per_title  # 这里定义一个标题生成多少篇文章
     save_path = args.save_path  # 设置存到哪
 
