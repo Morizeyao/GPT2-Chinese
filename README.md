@@ -19,6 +19,7 @@
 - generate.py 与 train.py 分别是生成与训练的脚本，使用pytorch-transformers库。
 - cache/vocab_small.txt 与 config/model_config_small.json 是我目前试验性缩小Bert tokenizer词表大小从而缩小模型大小的产物，两者组合可以在四张2080ti上实现12的batch size。
 - train.json 是训练样本的格式范例，可供参考。
+- train_single.py 是 train.py的延伸，可以用于一个很大的单独元素列表（如训练一本书）。
 - generate_texts.py 是 generate.py 的延伸，可以以一个列表的起始关键词分别生成若干个句子并输出到文件中。
 
 ## 注意
