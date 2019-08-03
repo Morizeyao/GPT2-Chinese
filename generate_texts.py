@@ -95,10 +95,8 @@ def sample_sequence(model, length, context, num_samples=1, temperature=1, top_k=
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--device', default='1,2,3,4', type=str, required=False)
+    parser.add_argument('--device', default='0,1,2,3', type=str, required=False)
     parser.add_argument('--length', default=-1, type=int, required=False)
-    parser.add_argument('--batch_size', default=1, type=int, required=False)
-    parser.add_argument('--nsamples', default=10, type=int, required=False)
     parser.add_argument('--temperature', default=1, type=float, required=False)
     parser.add_argument('--topk', default=8, type=int, required=False)
     parser.add_argument('--topp', default=0, type=float, required=False)
@@ -115,8 +113,6 @@ def main():
 
     os.environ["CUDA_VISIBLE_DEVICES"] = args.device  # 此处设置程序使用哪些显卡
     length = args.length
-    batch_size = args.batch_size
-    nsamples = args.nsamples
     temperature = args.temperature
     topk = args.topk
     topp = args.topp
@@ -163,6 +159,7 @@ def main():
 
                 print("=" * 40 + " SAMPLE " + str(generated) + " " + "=" * 40)
                 text = ''.join(text).replace('##', '').strip()
+                # text = ''.join(text.split('\n')[:-1])
                 print(text)
                 f.write(text)
                 print("=" * 80)

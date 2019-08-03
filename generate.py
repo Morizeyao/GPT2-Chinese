@@ -92,7 +92,7 @@ def sample_sequence(model, length, context, num_samples=1, temperature=1, top_k=
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--device', default='1,2,3,4', type=str, required=False)
+    parser.add_argument('--device', default='0,1,2,3', type=str, required=False)
     parser.add_argument('--length', default=-1, type=int, required=False)
     parser.add_argument('--batch_size', default=1, type=int, required=False)
     parser.add_argument('--nsamples', default=10, type=int, required=False)
@@ -102,6 +102,7 @@ def main():
     parser.add_argument('--model_config', default='config/model_config_small.json', type=str, required=False)
     parser.add_argument('--tokenizer_path', default='cache/vocab_small.txt', type=str, required=False)
     parser.add_argument('--model_path', default='model/final_model', type=str, required=False)
+    parser.add_argument('--prefix', default='萧炎', type=str, required=False)
 
     args = parser.parse_args()
     print(args)
@@ -128,7 +129,7 @@ def main():
         raise ValueError("Can't get samples longer than window size: %s" % model.config.n_ctx)
 
     while True:
-        raw_text = '萧炎'
+        raw_text = args.prefix
         context_tokens = tokenizer.convert_tokens_to_ids(tokenizer.tokenize(raw_text))
         generated = 0
         for _ in range(nsamples // batch_size):

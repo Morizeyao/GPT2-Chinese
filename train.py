@@ -36,7 +36,7 @@ def build_files(data_path, tokenized_data_path, num_pieces, full_tokenizer):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--device', default='1,2,3,4', type=str, required=False)
+    parser.add_argument('--device', default='0,1,2,3', type=str, required=False)
     parser.add_argument('--model_config', default='config/model_config_small.json', type=str, required=False)
     parser.add_argument('--tokenizer_path', default='cache/vocab_small.txt', type=str, required=False)
     parser.add_argument('--raw_data_path', default='data/train.json', type=str, required=False)
