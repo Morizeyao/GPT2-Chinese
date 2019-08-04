@@ -88,26 +88,18 @@ def main():
         build_files(raw_data_path=raw_data_path, tokenized_data_path=tokenized_data_path, full_tokenizer=full_tokenizer,
                     num_pieces=num_pieces)
         print('files built')
-        exit(1)
 
     model = pytorch_transformers.modeling_gpt2.GPT2LMHeadModel(config=model_config)
     model.to(device)
     multi_gpu = False
+    full_len = 0
     print('calculating total steps')
-
-    with open(tokenized_data_path + 'tokenized_train.txt', 'r') as f:
-        all_text = f.read().split()
-        all_ids = [int(token) for token in all_text]
-    len_all_ids = len(all_ids)
-    num_chunks = len_all_ids // stride
-    samples = []
-    start_point = 0
-    while start_point + n_ctx < len_all_ids:
-        samples.append(all_ids[start_point:start_point + n_ctx])
-        start_point += stride
-
-    total_steps = int(num_chunks * epochs / batch_size / gradient_accumulation)
+    for i in tqdm(range(num_pieces)):
+        with open(tokenized_data_path + 'tokenized_train_{}.txt'.format(i), 'r') as f:
+            full_len += len([int(item) for item in f.read().strip().split()])
+    total_steps = int(full_len / stride * epochs / batch_size / gradient_accumulation)
     print('total steps = {}'.format(total_steps))
+
     optimizer = pytorch_transformers.AdamW(model.parameters(), lr=lr, correct_bias=True)
     scheduler = pytorch_transformers.WarmupLinearSchedule(optimizer, warmup_steps=warmup_steps,
                                                           t_total=total_steps)

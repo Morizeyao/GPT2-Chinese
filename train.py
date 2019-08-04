@@ -104,6 +104,7 @@ def main():
             full_len += len([int(item) for item in f.read().strip().split()])
     total_steps = int(full_len / stride * epochs / batch_size / gradient_accumulation)
     print('total steps = {}'.format(total_steps))
+
     optimizer = pytorch_transformers.AdamW(model.parameters(), lr=lr, correct_bias=True)
     scheduler = pytorch_transformers.WarmupLinearSchedule(optimizer, warmup_steps=warmup_steps,
                                                           t_total=total_steps)
