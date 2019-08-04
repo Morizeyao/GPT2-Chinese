@@ -10,7 +10,6 @@ from pytorch_transformers import GPT2LMHeadModel
 os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2,3"  # 此处设置程序使用哪些显卡
 
 
-
 def _is_chinese_char(char):
     """Checks whether CP is the codepoint of a CJK character."""
     # This defines a "chinese character" as anything in the CJK Unicode block:
@@ -33,6 +32,7 @@ def _is_chinese_char(char):
         return True
 
     return False
+
 
 def top_k_top_p_filtering(logits, top_k=0, top_p=0.0, filter_value=-float('Inf')):
     """ Filter a distribution of logits using top-k and/or nucleus (top-p) filtering
@@ -95,18 +95,20 @@ def sample_sequence(model, length, context, num_samples=1, temperature=1, top_k=
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--device', default='0,1,2,3', type=str, required=False)
-    parser.add_argument('--length', default=-1, type=int, required=False)
-    parser.add_argument('--temperature', default=1, type=float, required=False)
-    parser.add_argument('--topk', default=8, type=int, required=False)
-    parser.add_argument('--topp', default=0, type=float, required=False)
-    parser.add_argument('--model_config', default='config/model_config_small.json', type=str, required=False)
-    parser.add_argument('--tokenizer_path', default='cache/vocab_small.txt', type=str, required=False)
-    parser.add_argument('--model_path', default='model/final_model', type=str, required=False)
-    parser.add_argument('--save_path', default='generated/', type=str, required=False)
-    parser.add_argument('--articles_per_title', default=5, type=int, required=False)
-    parser.add_argument('--titles', default='萧炎', type=str, required=False)
-    parser.add_argument('--titles_file', default='', type=str, required=False)
+    parser.add_argument('--device', default='0,1,2,3', type=str, required=False, help='设置使用哪些显卡')
+    parser.add_argument('--length', default=-1, type=int, required=False, help='生成长度')
+    parser.add_argument('--temperature', default=1, type=float, required=False, help='生成温度，越高越随机')
+    parser.add_argument('--topk', default=8, type=int, required=False, help='生成的时候最高几选一')
+    parser.add_argument('--topp', default=0, type=float, required=False, help='生成的时候积累概率最高多少')
+    parser.add_argument('--model_config', default='config/model_config_small.json', type=str, required=False,
+                        help='模型参数路径')
+    parser.add_argument('--tokenizer_path', default='cache/vocab_small.txt', type=str, required=False, help='词表路径')
+    parser.add_argument('--model_path', default='model/final_model', type=str, required=False, help='模型路径')
+    parser.add_argument('--save_path', default='generated/', type=str, required=False, help='存放生成的文件的路径')
+    parser.add_argument('--articles_per_title', default=5, type=int, required=False, help='每个标题生成多少篇文章')
+    parser.add_argument('--titles', default='萧炎', type=str, required=False, help='标题列表，是一个字符串，用空格分开')
+    parser.add_argument('--titles_file', default='', type=str, required=False,
+                        help='标题列表文件，文件中每行一个标题。如果这个选项有值则titles无效')
 
     args = parser.parse_args()
     print(args)
