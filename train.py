@@ -86,6 +86,9 @@ def main():
     num_pieces = args.num_pieces
     output_dir = args.output_dir
 
+    if not os.path.exists(output_dir):
+        os.mkdir(output_dir)
+
     if raw:
         print('building files')
         build_files(data_path=raw_data_path, tokenized_data_path=tokenized_data_path, num_pieces=num_pieces,
