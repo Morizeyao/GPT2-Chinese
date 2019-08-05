@@ -21,6 +21,8 @@ def build_files(data_path, tokenized_data_path, num_pieces, full_tokenizer):
         all_len = len(lines)
     for i in tqdm(range(num_pieces)):
         sublines = lines[all_len // num_pieces * i: all_len // num_pieces * (i + 1)]
+        if i == num_pieces - 1:
+            sublines.extend(lines[all_len // num_pieces * (i + 1):])  # 把尾部例子添加到最后一个piece
         sublines = [full_tokenizer.tokenize(line) for line in sublines if len(line) > 128]  # 只考虑长度超过128的句子
         sublines = [full_tokenizer.convert_tokens_to_ids(line) for line in sublines]
         full_line = []
@@ -37,10 +39,12 @@ def build_files(data_path, tokenized_data_path, num_pieces, full_tokenizer):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--device', default='0,1,2,3', type=str, required=False, help='设置使用哪些显卡')
-    parser.add_argument('--model_config', default='config/model_config_small.json', type=str, required=False, help='选择模型参数')
+    parser.add_argument('--model_config', default='config/model_config_small.json', type=str, required=False,
+                        help='选择模型参数')
     parser.add_argument('--tokenizer_path', default='cache/vocab_small.txt', type=str, required=False, help='选择词库')
     parser.add_argument('--raw_data_path', default='data/train.json', type=str, required=False, help='原始训练语料')
-    parser.add_argument('--tokenized_data_path', default='data/tokenized', type=str, required=False, help='tokenized语料存放位置')
+    parser.add_argument('--tokenized_data_path', default='data/tokenized', type=str, required=False,
+                        help='tokenized语料存放位置')
     parser.add_argument('--raw', action='store_true', help='是否先做tokenize')
     parser.add_argument('--epochs', default=5, type=int, required=False, help='训练循环')
     parser.add_argument('--batch_size', default=8, type=int, required=False, help='训练batch size')
@@ -142,8 +146,11 @@ def main():
             while start_point < len(tokens) - n_ctx:
                 samples.append(tokens[start_point: start_point + n_ctx])
                 start_point += stride
+            last_sample = tokens[start_point:]
+            last_sample = last_sample.extend([0] * (n_ctx - len(last_sample)))
+            samples.append(last_sample)
             random.shuffle(samples)
-            for step in range(len(samples) // batch_size):
+            for step in range(len(samples) // batch_size):  # drop last
 
                 #  prepare data
                 batch = samples[step * batch_size: (step + 1) * batch_size]
