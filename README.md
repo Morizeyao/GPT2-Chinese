@@ -52,7 +52,7 @@
 
 ![avatar](sample/tiyu.jpg)
 
-- 下为体育新闻的生成样例，使用约50M参数的GPT2以12Batch Size在约300MB体育新闻内容上训练得到。此处[SEP]表示换行，[CLS]表示新的文章，d表示数字。
+- 下为古诗的生成样例，在约180MB古诗内容上训练得到。
 
 ![avatar](sample/poem_1.png)
 ![avatar](sample/poem_2.png)
