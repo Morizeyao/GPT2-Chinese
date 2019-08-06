@@ -25,7 +25,7 @@
 ## 注意
 
 - pytorch-pretrained-bert现在已经改名为pytorch-transformers了，我已经将train.py更新，适应新的版本，旧版本的train.py更名为train_old.py，不再更新。
-- 模型因商业原因无法公布，需自行运算。各位如果完成了预训练的话欢迎进行交流。
+- 模型需自行运算。各位如果完成了预训练的话欢迎进行交流。
 - 如果你的内存非常大或者语料较小的话，可以改掉train.py内build files内的对应代码，不做拆分直接预处理语料。
 
 ## 语料
