@@ -11,7 +11,7 @@ from tqdm import tqdm
 from torch.nn import DataParallel
 
 
-def build_files(data_path, tokenized_data_path, num_pieces, full_tokenizer):
+def build_files(data_path, tokenized_data_path, num_pieces, full_tokenizer, min_length):
     if not os.path.exists(tokenized_data_path):
         os.mkdir(tokenized_data_path)
     with open(data_path, 'r', encoding='utf8') as f:
@@ -23,7 +23,7 @@ def build_files(data_path, tokenized_data_path, num_pieces, full_tokenizer):
         sublines = lines[all_len // num_pieces * i: all_len // num_pieces * (i + 1)]
         if i == num_pieces - 1:
             sublines.extend(lines[all_len // num_pieces * (i + 1):])  # 把尾部例子添加到最后一个piece
-        sublines = [full_tokenizer.tokenize(line) for line in sublines if len(line) > 128]  # 只考虑长度超过128的句子
+        sublines = [full_tokenizer.tokenize(line) for line in sublines if len(line) > min_length]  # 只考虑长度超过128的句子
         sublines = [full_tokenizer.convert_tokens_to_ids(line) for line in sublines]
         full_line = []
         for subline in sublines:
@@ -57,6 +57,7 @@ def main():
     parser.add_argument('--fp16_opt_level', default='O1', type=str, required=False)
     parser.add_argument('--max_grad_norm', default=1.0, type=float, required=False)
     parser.add_argument('--num_pieces', default=100, type=int, required=False, help='将训练语料分成多少份')
+    parser.add_argument('--min_length', default=128, type=int, required=False, help='最短收录文章长度')
     parser.add_argument('--output_dir', default='model/', type=str, required=False, help='模型输出路径')
     parser.add_argument('--pretrained_model', default='', type=str, required=False, help='模型训练起点路径')
     args = parser.parse_args()
@@ -84,7 +85,9 @@ def main():
     fp16_opt_level = args.fp16_opt_level
     max_grad_norm = args.max_grad_norm
     num_pieces = args.num_pieces
+    min_length = args.min_length
     output_dir = args.output_dir
+   
 
     if not os.path.exists(output_dir):
         os.mkdir(output_dir)
@@ -92,7 +95,7 @@ def main():
     if raw:
         print('building files')
         build_files(data_path=raw_data_path, tokenized_data_path=tokenized_data_path, num_pieces=num_pieces,
-                    full_tokenizer=full_tokenizer)
+                    full_tokenizer=full_tokenizer, min_length=min_length)
         print('files built')
 
     if not args.pretrained_model:
