@@ -56,6 +56,8 @@ def main():
     parser.add_argument('--max_grad_norm', default=1.0, type=float, required=False)
     parser.add_argument('--num_pieces', default=100, type=int, required=False, help='将训练语料分成多少份')
     parser.add_argument('--output_dir', default='model/', type=str, required=False, help='模型输出路径')
+    parser.add_argument('--pretrained_model', default='', type=str, required=False, help='模型训练起点路径')
+
     args = parser.parse_args()
     print(args)
 
@@ -89,7 +91,10 @@ def main():
                     num_pieces=num_pieces)
         print('files built')
 
-    model = pytorch_transformers.modeling_gpt2.GPT2LMHeadModel(config=model_config)
+    if not args.pretrained_model:
+        model = pytorch_transformers.modeling_gpt2.GPT2LMHeadModel(config=model_config)
+    else:
+        model = pytorch_transformers.modeling_gpt2.GPT2LMHeadModel.from_pretrained(args.pretrained_model)
     model.to(device)
     multi_gpu = False
     full_len = 0
