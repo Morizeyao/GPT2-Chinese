@@ -152,9 +152,9 @@ def main():
             while start_point < len(tokens) - n_ctx:
                 samples.append(tokens[start_point: start_point + n_ctx])
                 start_point += stride
-            last_sample = tokens[start_point:]
-            last_sample = last_sample.extend([0] * (n_ctx - len(last_sample)))
-            samples.append(last_sample)
+            # last_sample = tokens[start_point:]
+            # last_sample = last_sample.extend([0] * (n_ctx - len(last_sample)))
+            # samples.append(last_sample)
             random.shuffle(samples)
             for step in range(len(samples) // batch_size):  # drop last
 
