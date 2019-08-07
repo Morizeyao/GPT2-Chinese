@@ -27,9 +27,9 @@ def build_files(data_path, tokenized_data_path, num_pieces, full_tokenizer, min_
         sublines = [full_tokenizer.convert_tokens_to_ids(line) for line in sublines]
         full_line = []
         for subline in sublines:
-            full_line.append(103)  # 103是MASK，表示文章开始
+            full_line.append(full_tokenizer.convert_tokens_to_ids('[MASK]')[0])  # 文章开头添加MASK表示文章开始
             full_line.extend(subline)
-            full_line.append(101)  # 101是CLS，文章之间添加CLS表示文章结束
+            full_line.append(full_tokenizer.convert_tokens_to_ids('[CLS]')[0])  # 文章之间添加CLS表示文章结束
         with open(tokenized_data_path + 'tokenized_train_{}.txt'.format(i), 'w') as f:
             for id in full_line:
                 f.write(str(id) + ' ')
@@ -152,9 +152,6 @@ def main():
             while start_point < len(tokens) - n_ctx:
                 samples.append(tokens[start_point: start_point + n_ctx])
                 start_point += stride
-            # last_sample = tokens[start_point:]
-            # last_sample = last_sample.extend([0] * (n_ctx - len(last_sample)))
-            # samples.append(last_sample)
             random.shuffle(samples)
             for step in range(len(samples) // batch_size):  # drop last
 
