@@ -6,6 +6,7 @@ import random
 import tokenization_bert
 import numpy as np
 import argparse
+from torch.utils.tensorboard import SummaryWriter
 from datetime import datetime
 from tqdm import tqdm
 from torch.nn import DataParallel
@@ -60,6 +61,7 @@ def main():
     parser.add_argument('--min_length', default=128, type=int, required=False, help='最短收录文章长度')
     parser.add_argument('--output_dir', default='model/', type=str, required=False, help='模型输出路径')
     parser.add_argument('--pretrained_model', default='', type=str, required=False, help='模型训练起点路径')
+    parser.add_argument('--writer_dir', default='tensorboard_summary/', type=str, required=False, help='Tensorboard路径')
     args = parser.parse_args()
     print(args)
 
@@ -87,6 +89,7 @@ def main():
     num_pieces = args.num_pieces
     min_length = args.min_length
     output_dir = args.output_dir
+    tb_writer = SummaryWriter(log_dir=args.writer_dir)
    
 
     if not os.path.exists(output_dir):
@@ -134,6 +137,7 @@ def main():
         model = DataParallel(model)
         multi_gpu = True
     print('starting training')
+    overall_step = 0
     for epoch in range(epochs):
         print('epoch {}'.format(epoch + 1))
         now = datetime.now()
@@ -195,7 +199,10 @@ def main():
                     scheduler.step()
                     optimizer.step()
                     optimizer.zero_grad()
-                if (step + 1) % log_step == 0:
+                    overall_step += 1
+                    if (overall_step + 1) % log_step == 0:
+                        tb_writer.add_scalar('loss', loss.item(), overall_step)
+                if (overall_step + 1) % log_step == 0:
                     print('now time: {}:{}. Step {} of piece {} of epoch {}, loss {}'.format(
                         datetime.now().hour,
                         datetime.now().minute,
