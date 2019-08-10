@@ -3,7 +3,6 @@ import torch
 import os
 import json
 import random
-import tokenization_bert
 import numpy as np
 import argparse
 from torch.utils.tensorboard import SummaryWriter
@@ -62,9 +61,16 @@ def main():
     parser.add_argument('--output_dir', default='model/', type=str, required=False, help='模型输出路径')
     parser.add_argument('--pretrained_model', default='', type=str, required=False, help='模型训练起点路径')
     parser.add_argument('--writer_dir', default='tensorboard_summary/', type=str, required=False, help='Tensorboard路径')
+    parser.add_argument('--no_wordpiece', action='store_true', help='不做word piece切词')
+
     args = parser.parse_args()
     print(args)
 
+    if args.no_wordpiece:
+        import tokenization_bert_without_wordpiece as torknization_bert
+    else:
+        import tokenization_bert
+        
     os.environ["CUDA_VISIBLE_DEVICES"] = args.device  # 此处设置程序使用哪些显卡
     model_config = pytorch_transformers.modeling_gpt2.GPT2Config.from_json_file(args.model_config)
     n_ctx = model_config.n_ctx
