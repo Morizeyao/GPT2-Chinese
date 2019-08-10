@@ -67,7 +67,7 @@ def main():
     print(args)
 
     if args.no_wordpiece:
-        import tokenization_bert_without_wordpiece as torknization_bert
+        import tokenization_bert_without_wordpiece as tokenization_bert
     else:
         import tokenization_bert
         
