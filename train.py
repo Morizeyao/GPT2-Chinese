@@ -70,7 +70,7 @@ def main():
         import tokenization_bert_without_wordpiece as tokenization_bert
     else:
         import tokenization_bert
-        
+
     os.environ["CUDA_VISIBLE_DEVICES"] = args.device  # 此处设置程序使用哪些显卡
     model_config = pytorch_transformers.modeling_gpt2.GPT2Config.from_json_file(args.model_config)
     n_ctx = model_config.n_ctx

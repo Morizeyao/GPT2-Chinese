@@ -17,7 +17,7 @@
 ## 文件结构
 
 - generate.py 与 train.py 分别是生成与训练的脚本。
-- cache/vocab_small.txt 与 config/model_config_small.json 是缩小版的词表与模型构造设置，约80M参数。
+- cache 内包含若干BERT词表，vocab.txt 是原始BERT词表， vocab_all.txt 额外添加了古文词， vocab_small.txt 是小词表， no_word_piece的是没有word piece的词表。
 - train.json 是训练样本的格式范例，可供参考。
 - train_single.py 是 train.py的延伸，可以用于一个很大的单独元素列表（如训练一本书）。
 - generate_texts.py 是 generate.py 的延伸，可以以一个列表的起始关键词分别生成若干个句子并输出到文件中。
@@ -40,6 +40,19 @@
 
 - QQ：330501241
 - Mail：ned1991@gmail.com
+
+## Citing
+
+```
+@misc{GPT2-Chinese,
+  author = {Zeyao Du},
+  title = {GPT2-Chinese: Tools for training GPT2 model in Chinese language},
+  year = {2019},
+  publisher = {GitHub},
+  journal = {GitHub repository},
+  howpublished = {\url{https://github.com/Morizeyao/GPT2-Chinese}},
+}
+```
  
 ## 生成样例
 
@@ -62,15 +75,4 @@
 ![avatar](sample/浣溪沙_江城子.png)
 ![avatar](sample/蝶恋花_满江红.png)
 
-## Citing
 
-```
-@misc{GPT2-Chinese,
-  author = {Zeyao Du},
-  title = {GPT2-Chinese: Tools for training GPT2 model in Chinese language},
-  year = {2019},
-  publisher = {GitHub},
-  journal = {GitHub repository},
-  howpublished = {\url{https://github.com/Morizeyao/GPT2-Chinese}},
-}
-```
