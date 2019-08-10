@@ -57,6 +57,11 @@
 ![avatar](sample/poem_1.png)
 ![avatar](sample/poem_2.png)
 
+- 下为古诗限定了生成体裁后的生成样例
+
+![avatar](sample/律诗绝句.png)
+![avatar](sample/浣溪沙_江城子.png)
+![avatar](sample/蝶恋花_满江红.png)
 
 ## Citing
 
