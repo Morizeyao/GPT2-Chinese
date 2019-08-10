@@ -10,24 +10,23 @@
 
 ## 使用方法
 
-- 在项目根目录建立data文件夹。将训练语料以train.json为名放入data目录中。train.json里是一个json，json是一个列表，列表的每个元素都分别是一篇要训练的文章。
-- 运行train.py文件，会自动预处理数据。
-- 预处理完成之后，将train.py文件内的raw改成False，然后运行，即可开始训练。
+- 在项目根目录建立data文件夹。将训练语料以train.json为名放入data目录中。train.json里是一个json列表，列表的每个元素都分别是一篇要训练的文章。
+- 运行train.py文件，勾选 --raw ，会自动预处理数据。
+- 预处理完成之后，直接运行train.py文件，即可开始训练。
 
 ## 文件结构
 
-- generate.py 与 train.py 分别是生成与训练的脚本，使用pytorch-transformers库。
-- cache/vocab_small.txt 与 config/model_config_small.json 是我目前试验性缩小Bert tokenizer词表大小从而缩小模型大小的产物，两者组合可以在四张2080ti上实现12的batch size。
+- generate.py 与 train.py 分别是生成与训练的脚本。
+- cache/vocab_small.txt 与 config/model_config_small.json 是缩小版的词表与模型构造设置，约80M参数。
 - train.json 是训练样本的格式范例，可供参考。
 - train_single.py 是 train.py的延伸，可以用于一个很大的单独元素列表（如训练一本书）。
 - generate_texts.py 是 generate.py 的延伸，可以以一个列表的起始关键词分别生成若干个句子并输出到文件中。
 
 ## 注意
 
-- pytorch-pretrained-bert现在已经改名为pytorch-transformers了，我已经将train.py更新，适应新的版本，旧版本的train.py更名为train_old.py，不再更新。
-- 模型因商业原因无法公布，需自行运算。各位如果完成了预训练的话欢迎进行交流。
+- 模型需自行运算。各位如果完成了预训练的话欢迎进行交流。
 - 如果你的内存非常大或者语料较小的话，可以改掉train.py内build files内的对应代码，不做拆分直接预处理语料。
-- 
+
 ## 语料
 
 - 可以从[这里](https://github.com/brightmart/nlp_chinese_corpus)与[这里](http://thuctc.thunlp.org/#获取链接)下载。
@@ -52,7 +51,7 @@
 
 ![avatar](sample/tiyu.jpg)
 
-- 下为古诗的生成样例，在约180MB古诗内容上训练得到。
+- 下为古诗词的生成样例，由用户[JamesHujy](https://github.com/JamesHujy)运算并贡献。
 
 ![avatar](sample/poem_1.png)
 ![avatar](sample/poem_2.png)

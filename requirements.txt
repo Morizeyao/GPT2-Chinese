@@ -5,3 +5,4 @@ numpy
 tqdm
 sklearn
 keras
+tb-nightly

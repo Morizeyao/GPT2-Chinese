@@ -6,6 +6,7 @@ import random
 import tokenization_bert
 import numpy as np
 import argparse
+from torch.utils.tensorboard import SummaryWriter
 from datetime import datetime
 from tqdm import tqdm
 from torch.nn import DataParallel
@@ -27,9 +28,9 @@ def build_files(data_path, tokenized_data_path, num_pieces, full_tokenizer, min_
         sublines = [full_tokenizer.convert_tokens_to_ids(line) for line in sublines]
         full_line = []
         for subline in sublines:
-            full_line.append(103)  # 103是MASK，表示文章开始
+            full_line.append(full_tokenizer.convert_tokens_to_ids('[MASK]'))  # 文章开头添加MASK表示文章开始
             full_line.extend(subline)
-            full_line.append(101)  # 101是CLS，文章之间添加CLS表示文章结束
+            full_line.append(full_tokenizer.convert_tokens_to_ids('[CLS]'))  # 文章之间添加CLS表示文章结束
         with open(tokenized_data_path + 'tokenized_train_{}.txt'.format(i), 'w') as f:
             for id in full_line:
                 f.write(str(id) + ' ')
@@ -60,6 +61,7 @@ def main():
     parser.add_argument('--min_length', default=128, type=int, required=False, help='最短收录文章长度')
     parser.add_argument('--output_dir', default='model/', type=str, required=False, help='模型输出路径')
     parser.add_argument('--pretrained_model', default='', type=str, required=False, help='模型训练起点路径')
+    parser.add_argument('--writer_dir', default='tensorboard_summary/', type=str, required=False, help='Tensorboard路径')
     args = parser.parse_args()
     print(args)
 
@@ -87,6 +89,7 @@ def main():
     num_pieces = args.num_pieces
     min_length = args.min_length
     output_dir = args.output_dir
+    tb_writer = SummaryWriter(log_dir=args.writer_dir)
    
 
     if not os.path.exists(output_dir):
@@ -134,6 +137,7 @@ def main():
         model = DataParallel(model)
         multi_gpu = True
     print('starting training')
+    overall_step = 0
     for epoch in range(epochs):
         print('epoch {}'.format(epoch + 1))
         now = datetime.now()
@@ -152,9 +156,9 @@ def main():
             while start_point < len(tokens) - n_ctx:
                 samples.append(tokens[start_point: start_point + n_ctx])
                 start_point += stride
-            last_sample = tokens[start_point:]
-            last_sample = last_sample.extend([0] * (n_ctx - len(last_sample)))
-            samples.append(last_sample)
+            start_point -= stride
+            last = tokens[start_point + n_ctx :]
+            last.extend([full_tokenizer.convert_tokens_to_ids(['[PAD]']) * (n_ctx - len(last))])
             random.shuffle(samples)
             for step in range(len(samples) // batch_size):  # drop last
 
@@ -195,7 +199,10 @@ def main():
                     scheduler.step()
                     optimizer.step()
                     optimizer.zero_grad()
-                if (step + 1) % log_step == 0:
+                    overall_step += 1
+                    if (overall_step + 1) % log_step == 0:
+                        tb_writer.add_scalar('loss', loss.item(), overall_step)
+                if (overall_step + 1) % log_step == 0:
                     print('now time: {}:{}. Step {} of piece {} of epoch {}, loss {}'.format(
                         datetime.now().hour,
                         datetime.now().minute,

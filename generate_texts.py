@@ -129,7 +129,7 @@ def main():
 
     tokenizer = tokenization_bert.BertTokenizer(vocab_file=args.tokenizer_path)
     model_config = pytorch_transformers.GPT2Config.from_json_file(args.model_config)
-    model = GPT2LMHeadModel(config=model_config).from_pretrained(args.model_path)
+    model = GPT2LMHeadModel.from_pretrained(args.model_path)
     model.to(device)
     model.eval()
 
