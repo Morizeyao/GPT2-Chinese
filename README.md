@@ -56,7 +56,7 @@
 ![avatar](sample/poem_1.png)
 ![avatar](sample/poem_2.png)
 
-- 下为古诗限定了生成体裁后的生成样例
+- 下为古诗限定了生成体裁后的生成样例，由用户[JamesHujy](https://github.com/JamesHujy)运算并贡献。
 
 ![avatar](sample/律诗绝句.png)
 ![avatar](sample/浣溪沙_江城子.png)
