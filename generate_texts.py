@@ -151,6 +151,14 @@ def main():
                     temperature=temperature, top_k=topk, top_p=topp, device=device
                 )
                 out = out.tolist()
+
+                for i, item in enumerate(out):  # 确保英文前后有空格
+                    if i == len(out) - 1:
+                        break
+                    else:
+                        if item.isalpha() and out[i + 1].isalpha:
+                            out[i] = item + ' '
+
                 generated += 1
                 text = tokenizer.convert_ids_to_tokens(out[0])
                 for i, item in enumerate(text):
