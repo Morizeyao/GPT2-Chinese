@@ -23,7 +23,7 @@ def build_files(data_path, tokenized_data_path, num_pieces, full_tokenizer, min_
         sublines = lines[all_len // num_pieces * i: all_len // num_pieces * (i + 1)]
         if i == num_pieces - 1:
             sublines.extend(lines[all_len // num_pieces * (i + 1):])  # 把尾部例子添加到最后一个piece
-        sublines = [full_tokenizer.tokenize(line) for line in sublines if len(line) > min_length]  # 只考虑长度超过128的句子
+        sublines = [full_tokenizer.tokenize(line) for line in sublines if len(line) > min_length]  # 只考虑长度超过min_length的句子
         sublines = [full_tokenizer.convert_tokens_to_ids(line) for line in sublines]
         full_line = []
         for subline in sublines:
