@@ -10,6 +10,13 @@ from pytorch_transformers import GPT2LMHeadModel
 os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2,3"  # 此处设置程序使用哪些显卡
 
 
+def is_word(word):
+    for item in list(word):
+        if item not in 'qwertyuiopasdfghjklzxcvbnm':
+            return False
+    return True
+
+
 def _is_chinese_char(char):
     """Checks whether CP is the codepoint of a CJK character."""
     # This defines a "chinese character" as anything in the CJK Unicode block:
@@ -156,7 +163,7 @@ def main():
                 text = tokenizer.convert_ids_to_tokens(out[0])
 
                 for i, item in enumerate(text[:-1]):  # 确保英文前后有空格
-                    if item.isalpha() and text[i + 1].isalpha:
+                    if is_word(item) and is_word(text[i + 1]):
                         text[i] = item + ' '
 
                 for i, item in enumerate(text):

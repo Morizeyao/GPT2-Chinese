@@ -8,6 +8,13 @@ from tqdm import trange
 from pytorch_transformers import GPT2LMHeadModel
 
 
+def is_word(word):
+    for item in list(word):
+        if item not in 'qwertyuiopasdfghjklzxcvbnm':
+            return False
+    return True
+
+
 def _is_chinese_char(char):
     """Checks whether CP is the codepoint of a CJK character."""
     # This defines a "chinese character" as anything in the CJK Unicode block:
@@ -141,13 +148,12 @@ def main():
             )
             out = out.tolist()
 
-
             for i in range(batch_size):
                 generated += 1
                 text = tokenizer.convert_ids_to_tokens(out[0])
 
                 for i, item in enumerate(text[:-1]):  # 确保英文前后有空格
-                    if item.isalpha() and text[i + 1].isalpha:
+                    if is_word(item) and is_word(text[i + 1]):
                         text[i] = item + ' '
 
                 for i, item in enumerate(text):
