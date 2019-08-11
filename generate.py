@@ -147,7 +147,7 @@ def main():
                 text = tokenizer.convert_ids_to_tokens(out[0])
 
                 for i, item in enumerate(text[:-1]):  # 确保英文前后有空格
-                    if item.isalpha() and out[i + 1].isalpha:
+                    if item.isalpha() and text[i + 1].isalpha:
                         text[i] = item + ' '
 
                 for i, item in enumerate(text):
