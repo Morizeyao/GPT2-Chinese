@@ -1,3 +1,8 @@
+[UNK]
+[CLS]
+[MASK]
+[SEP]
+[PAD]
 狺
 従
 
