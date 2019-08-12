@@ -59,10 +59,12 @@ def main():
     parser.add_argument('--pretrained_model', default='', type=str, required=False, help='模型训练起点路径')
 
     args = parser.parse_args()
-    print(args)
+    print('args:\n' + args.__repr__())
 
     os.environ["CUDA_VISIBLE_DEVICES"] = args.device  # 此处设置程序使用哪些显卡
     model_config = pytorch_transformers.modeling_gpt2.GPT2Config.from_json_file(args.model_config)
+    print('config:\n' + model_config.to_json_string())
+
     n_ctx = model_config.n_ctx
     full_tokenizer = tokenization_bert.BertTokenizer(vocab_file=args.tokenizer_path)
     full_tokenizer.max_len = n_ctx
