@@ -21,6 +21,7 @@
 - train.json 是训练样本的格式范例，可供参考。
 - train_single.py 是 train.py的延伸，可以用于一个很大的单独元素列表（如训练一本书）。
 - generate_texts.py 是 generate.py 的延伸，可以以一个列表的起始关键词分别生成若干个句子并输出到文件中。
+- eval.py 用于评估生成模型的ppl分值。
 
 ## 注意
 

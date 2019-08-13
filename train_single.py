@@ -103,6 +103,7 @@ def main():
         model = pytorch_transformers.modeling_gpt2.GPT2LMHeadModel(config=model_config)
     else:
         model = pytorch_transformers.modeling_gpt2.GPT2LMHeadModel.from_pretrained(args.pretrained_model)
+    model.train()
     model.to(device)
     multi_gpu = False
     full_len = 0
