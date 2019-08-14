@@ -6,3 +6,4 @@ tqdm
 sklearn
 keras
 tb-nightly
+future
