@@ -3,7 +3,6 @@ import torch
 import os
 import json
 import random
-import tokenization_bert
 import argparse
 import numpy as np
 from datetime import datetime
@@ -63,9 +62,9 @@ def main():
     print('args:\n' + args.__repr__())
 
     if args.no_wordpiece:
-        import tokenization_bert_without_wordpiece as tokenization_bert
+        from tokenizations import tokenization_bert_without_wordpiece as tokenization_bert
     else:
-        import tokenization_bert
+        pass
 
     os.environ["CUDA_VISIBLE_DEVICES"] = args.device  # 此处设置程序使用哪些显卡
     model_config = pytorch_transformers.modeling_gpt2.GPT2Config.from_json_file(args.model_config)

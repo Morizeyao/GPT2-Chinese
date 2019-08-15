@@ -7,3 +7,4 @@ sklearn
 keras
 tb-nightly
 future
+thulac

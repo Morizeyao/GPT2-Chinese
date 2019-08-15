@@ -5,7 +5,6 @@ import json
 import random
 import numpy as np
 import argparse
-from torch.utils.tensorboard import SummaryWriter
 from datetime import datetime
 from tqdm import tqdm
 from torch.nn import DataParallel
@@ -60,9 +59,9 @@ def main():
     print('args:\n' + args.__repr__())
 
     if args.no_wordpiece:
-        import tokenization_bert_without_wordpiece as tokenization_bert
+        from tokenizations import tokenization_bert_without_wordpiece as tokenization_bert
     else:
-        import tokenization_bert
+        from tokenizations import tokenization_bert
 
     os.environ["CUDA_VISIBLE_DEVICES"] = args.device  # 此处设置程序使用哪些显卡
 

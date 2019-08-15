@@ -1,8 +1,7 @@
 import torch
 import torch.nn.functional as F
-import pytorch_transformers
 import os
-import tokenization_bert
+from tokenizations import tokenization_bert
 import argparse
 from tqdm import trange
 from pytorch_transformers import GPT2LMHeadModel
