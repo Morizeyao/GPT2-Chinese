@@ -1,3 +1,8 @@
+[SEP]
+[PAD]
+[CLS]
+[MASK]
+[UNK]
 ，
 的
 。
