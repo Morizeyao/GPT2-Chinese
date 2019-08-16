@@ -1,9 +1,5 @@
 # GPT2-Chinese
 
-## UPDATE Jul 27
-
-- 为了保持项目的干净整洁，我做了一次更新清理。27日之前的内容以及训练斗破苍穹的脚本可以查看old_jul_27的Branch。
-
 ## 项目状态
 
 - 目前项目处于积极开发状态，但是主要架构已经稳定。如发现任何bug或是有功能意见与改进欢迎提交Issue，PR或是联系作者。
@@ -17,11 +13,11 @@
 ## 文件结构
 
 - generate.py 与 train.py 分别是生成与训练的脚本。
-- cache 内包含若干BERT词表，vocab.txt 是原始BERT词表， vocab_all.txt 额外添加了古文词， vocab_small.txt 是小词表， no_word_piece的是没有word piece的词表。
-- train.json 是训练样本的格式范例，可供参考。
 - train_single.py 是 train.py的延伸，可以用于一个很大的单独元素列表（如训练一本书）。
-- generate_texts.py 是 generate.py 的延伸，可以以一个列表的起始关键词分别生成若干个句子并输出到文件中。
 - eval.py 用于评估生成模型的ppl分值。
+- generate_texts.py 是 generate.py 的延伸，可以以一个列表的起始关键词分别生成若干个句子并输出到文件中。
+- train.json 是训练样本的格式范例，可供参考。
+- cache 文件夹内包含若干BERT词表，vocab.txt 是原始BERT词表， vocab_all.txt 额外添加了古文词， vocab_small.txt 是小词表， no_word_piece的是没有word piece的词表。
 - tokenizations 文件夹内是可以选用的三种tokenizer，包括默认的Bert Tokenizer，分词版Bert Tokenizer以及没有word piece的Bert Tokenizer。 
 
 ## 注意

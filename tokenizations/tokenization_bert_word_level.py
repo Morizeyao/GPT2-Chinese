@@ -27,7 +27,7 @@ from pytorch_transformers.tokenization_utils import PreTrainedTokenizer, clean_u
 
 logger = logging.getLogger(__name__)
 
-lac = thulac.thulac(user_dict='./thulac_dict/seg', seg_only=True)
+lac = thulac.thulac(user_dict='tokenizations/thulac_dict/seg', seg_only=True)
 
 VOCAB_FILES_NAMES = {'vocab_file': 'vocab.txt'}
 
