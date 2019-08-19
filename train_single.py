@@ -183,9 +183,9 @@ def main():
                 #  optimizer step
                 if (step + 1) % gradient_accumulation == 0:
                     running_loss += loss.item()
-                    scheduler.step()
                     optimizer.step()
                     optimizer.zero_grad()
+                    scheduler.step()
                 if (step + 1) % log_step == 0:
                     print('now time: {}:{}. Step {} of piece {} of epoch {}, loss {}'.format(
                         datetime.now().hour,

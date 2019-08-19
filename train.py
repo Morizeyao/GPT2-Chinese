@@ -209,9 +209,9 @@ def main():
                 #  optimizer step
                 if (step + 1) % gradient_accumulation == 0:
                     running_loss += loss.item()
-                    scheduler.step()
                     optimizer.step()
                     optimizer.zero_grad()
+                    scheduler.step()
                     overall_step += 1
                     if (overall_step + 1) % log_step == 0:
                         tb_writer.add_scalar('loss', loss.item(), overall_step)
