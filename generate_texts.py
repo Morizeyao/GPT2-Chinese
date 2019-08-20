@@ -2,7 +2,6 @@ import torch
 import torch.nn.functional as F
 import pytorch_transformers
 import os
-from tokenizations import tokenization_bert
 import argparse
 from tqdm import trange
 from pytorch_transformers import GPT2LMHeadModel
@@ -116,9 +115,18 @@ def main():
     parser.add_argument('--titles', default='萧炎', type=str, required=False, help='标题列表，是一个字符串，用空格分开')
     parser.add_argument('--titles_file', default='', type=str, required=False,
                         help='标题列表文件，文件中每行一个标题。如果这个选项有值则titles无效')
+    parser.add_argument('--no_wordpiece', action='store_true', help='不做word piece切词')
+    parser.add_argument('--segment', action='store_true', help='中文以词为单位')
 
     args = parser.parse_args()
-    print(args)
+    print('args:\n' + args.__repr__())
+
+    if args.no_wordpiece:
+        from tokenizations import tokenization_bert_without_wordpiece as tokenization_bert
+    elif args.segment:
+        from tokenizations import tokenization_bert_word_level as tokenization_bert
+    else:
+        from tokenizations import tokenization_bert
 
     os.environ["CUDA_VISIBLE_DEVICES"] = args.device  # 此处设置程序使用哪些显卡
     length = args.length
