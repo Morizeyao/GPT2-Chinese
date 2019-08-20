@@ -1,5 +1,9 @@
 # GPT2-Chinese
 
+## 项目简介
+
+- 中文的GPT2模型训练代码，基于Pytorch-Transformers，可以写诗，写新闻，写小说，或是训练通用语言模型等。支持分字模式与分词模式，可通过参数切换。支持切分语料库以适应极大训练语料。
+
 ## 项目状态
 
 - 目前项目处于积极开发状态，但是主要架构已经稳定。如发现任何bug或是有功能意见与改进欢迎提交Issue，PR或是联系作者。
@@ -34,7 +38,7 @@
 
 ## FP16与Gradient Accumulation支持
 
-- 我在train.py文件中加入了fp16与gradient accumulation支持，如果你安装了apex并且知道fp16是什么的话，可以修改变量fp16=True来启用。
+- 我在train.py文件中加入了fp16与gradient accumulation支持，如果你安装了apex并且知道fp16是什么的话，可以修改变量fp16=True来启用。但是目前fp16不收敛，原因不明。
 
 ## 联系作者
 
