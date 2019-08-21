@@ -159,7 +159,6 @@ def main():
         random.shuffle(x)
         piece_num = 0
         for i in x:
-            running_loss = 0
             with open(tokenized_data_path + 'tokenized_train_{}.txt'.format(i), 'r') as f:
                 line = f.read().strip()
             tokens = line.split()
