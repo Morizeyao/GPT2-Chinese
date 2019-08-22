@@ -2,6 +2,7 @@ import argparse
 import thulac
 import json
 
+from tqdm import tqdm
 from keras.preprocessing.text import Tokenizer
 
 
@@ -19,7 +20,7 @@ def main():
 
     f = open(args.raw_data_path, 'r')
     lines = json.load(f)
-    for i, line in enumerate(lines):
+    for i, line in enumerate(tqdm(lines)):
         lines[i] = lac.cut(line, text=True)
 
     tokenizer.fit_on_texts(lines)
