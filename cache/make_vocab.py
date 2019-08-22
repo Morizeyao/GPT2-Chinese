@@ -15,6 +15,7 @@ def main():
     lac = thulac.thulac(seg_only=True)
     tokenizer = Tokenizer(num_words=args.vocab_size)
     print('args:\n' + args.__repr__())
+    print('This script is extremely slow especially for large corpus. Take a break.')
 
     f = open(args.raw_data_path, 'r')
     lines = json.load(f)
