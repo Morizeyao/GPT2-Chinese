@@ -151,6 +151,7 @@ def main():
         multi_gpu = True
     print('starting training')
     overall_step = 0
+    running_loss = 0
     for epoch in range(epochs):
         print('epoch {}'.format(epoch + 1))
         now = datetime.now()
