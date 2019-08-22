@@ -2,7 +2,7 @@
 
 ## Description
 
-- Chinese version of GPT2 training code，based on the extremely awesome repository from HuggingFace team [Pytorch-Transformers](https://github.com/huggingface/pytorch-transformers). Can write poems, news, novels, or train general language models. Support char level and word level. Support large training corpus.
+- Chinese version of GPT2 training code, using BERT tokenizer. It is based on the extremely awesome repository from HuggingFace team [Pytorch-Transformers](https://github.com/huggingface/pytorch-transformers). Can write poems, news, novels, or train general language models. Support char level and word level. Support large training corpus.
 
 ## 项目状态
 
