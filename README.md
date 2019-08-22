@@ -22,7 +22,7 @@
 - eval.py 用于评估生成模型的ppl分值。
 - generate_texts.py 是 generate.py 的延伸，可以以一个列表的起始关键词分别生成若干个句子并输出到文件中。
 - train.json 是训练样本的格式范例，可供参考。
-- cache 文件夹内包含若干BERT词表，vocab.txt 是原始BERT词表， vocab_all.txt 额外添加了古文词， vocab_small.txt 是小词表， no_word_piece的是没有word piece的词表。
+- cache 文件夹内包含若干BERT词表，make_vocab.py 是一个协助在一个train.json语料文件上建立词表的脚本。 vocab.txt 是原始BERT词表， vocab_all.txt 额外添加了古文词， vocab_small.txt 是小词表， no_word_piece的是没有word piece的词表。
 - tokenizations 文件夹内是可以选用的三种tokenizer，包括默认的Bert Tokenizer，分词版Bert Tokenizer以及没有word piece的Bert Tokenizer。 
 
 ## 注意
