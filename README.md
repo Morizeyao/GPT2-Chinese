@@ -1,8 +1,8 @@
 # GPT2-Chinese
 
-## 项目简介
+## Description
 
-- 中文的GPT2模型训练代码，based on the extremely awesome repository from HuggingFace team [Pytorch-Transformers](https://github.com/huggingface/pytorch-transformers)。可以写诗，写新闻，写小说，或是训练通用语言模型等。支持分字模式与分词模式，可通过参数切换。支持切分语料库以适应极大训练语料。
+- Chinese version of GPT2 training code，based on the extremely awesome repository from HuggingFace team [Pytorch-Transformers](https://github.com/huggingface/pytorch-transformers). Can write poems, news, novels, or train general language models. Support char level and word level. Support large training corpus.
 
 ## 项目状态
 
