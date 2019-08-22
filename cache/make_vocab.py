@@ -28,7 +28,7 @@ def main():
     pre = ['[SEP]', '[CLS]', '[MASK]', '[PAD]', '[UNK]']
     vocab = pre + vocab
     with open(args.vocab_file, 'w') as f:
-        for word in vocab:
+        for word in vocab[:args.vocab_size + 5]:
             f.write(word + '\n')
 
 
