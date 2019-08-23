@@ -1,0 +1,8 @@
+
+.idea/GPT2-Chinese.iml
+.idea/misc.xml
+.idea/modules.xml
+.idea/vcs.xml
+.idea/workspace.xml
+tokenizations/__pycache__/tokenization_bert.cpython-36.pyc
+tokenizations/__pycache__/tokenization_bert_word_level.cpython-36.pyc
