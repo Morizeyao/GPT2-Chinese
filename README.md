@@ -2,8 +2,8 @@
 
 ## Description
 
-- Chinese version of GPT2 training code, using BERT tokenizer. It is based on the extremely awesome repository from HuggingFace team [Pytorch-Transformers](https://github.com/huggingface/pytorch-transformers). Can write poems, news, novels, or train general language models. Support char level and word level. Support large training corpus.
-- 中文的GPT2训练代码，使用BERT的Tokenizer。可以写诗，新闻，小说，或是训练通用语言模型。支持字为单位或是分词模式。支持大语料训练。
+- Chinese version of GPT2 training code, using BERT tokenizer or BPE tokenizer. It is based on the extremely awesome repository from HuggingFace team [Pytorch-Transformers](https://github.com/huggingface/pytorch-transformers). Can write poems, news, novels, or train general language models. Support char level, word level and BPE level. Support large training corpus.
+- 中文的GPT2训练代码，使用BERT的Tokenizer或GPT2自带的BPE Tokenizer（感谢[fengzuo97](https://github.com/fengzuo97)的支持。可以写诗，新闻，小说，或是训练通用语言模型。支持字为单位或是分词模式或是BPE模式。支持大语料训练。
 
 ## 项目状态
 
@@ -32,6 +32,7 @@
 - 如果使用分词版的tokenizer，最好先使用cache文件夹内的make_vocab.py文件建立针对你的语料的词表。
 - 模型需自行运算。各位如果完成了预训练的话欢迎进行交流。
 - 如果你的内存非常大或者语料较小的话，可以改掉train.py内build files内的对应代码，不做拆分直接预处理语料。
+- 若使用BPE Tokenizer，需自己建立中文词表
 
 ## 语料
 
