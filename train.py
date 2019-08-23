@@ -9,6 +9,7 @@ from torch.utils.tensorboard import SummaryWriter
 from datetime import datetime
 from tqdm import tqdm
 from torch.nn import DataParallel
+from tokenizations.bpe_tokenizer import get_encoder
 
 
 def build_files(data_path, tokenized_data_path, num_pieces, full_tokenizer, min_length):
@@ -64,6 +65,9 @@ def main():
     parser.add_argument('--writer_dir', default='tensorboard_summary/', type=str, required=False, help='Tensorboard路径')
     parser.add_argument('--no_wordpiece', action='store_true', help='不做word piece切词')
     parser.add_argument('--segment', action='store_true', help='中文以词为单位')
+    parser.add_argument('--bpe_token', action='store_true', help='subword')
+    parser.add_argument('--encoder_json', default="tokenizations/encoder.json", type=str, help="encoder.json")
+    parser.add_argument('--vocab_bpe', default="tokenizations/vocab.bpe", type=str, help="vocab.bpe")
 
     args = parser.parse_args()
     print('args:\n' + args.__repr__())
@@ -81,7 +85,10 @@ def main():
     print('config:\n' + model_config.to_json_string())
 
     n_ctx = model_config.n_ctx
-    full_tokenizer = tokenization_bert.BertTokenizer(vocab_file=args.tokenizer_path)
+    if args.bpe_token:
+        full_tokenizer = get_encoder(args.encoder_json, args.vocab_bpe)
+    else:
+        full_tokenizer = tokenization_bert.BertTokenizer(vocab_file=args.tokenizer_path)
     full_tokenizer.max_len = n_ctx
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     print('using device:', device)
