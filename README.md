@@ -5,6 +5,10 @@
 - Chinese version of GPT2 training code, using BERT tokenizer or BPE tokenizer. It is based on the extremely awesome repository from HuggingFace team [Pytorch-Transformers](https://github.com/huggingface/pytorch-transformers). Can write poems, news, novels, or train general language models. Support char level, word level and BPE level. Support large training corpus.
 - 中文的GPT2训练代码，使用BERT的Tokenizer或GPT2自带的BPE Tokenizer（感谢[fengzuo97](https://github.com/fengzuo97)的支持)。可以写诗，新闻，小说，或是训练通用语言模型。支持字为单位或是分词模式或是BPE模式。支持大语料训练。
 
+## UPDATE 8.24
+
+- 添加分词模式的生成样例（体育新闻）
+
 ## 项目状态
 
 - 目前项目主要架构已经稳定。如发现任何bug或是有功能意见与改进欢迎提交Issue，PR或是联系作者。
@@ -63,6 +67,12 @@
 ```
  
 ## 生成样例
+
+- 下为分词模式的生成样例，使用512长度，12层GPT2以12的Batch Size在300余MB体育新闻上训练得到。
+
+![avatar](sample/seg1.png)
+
+![avatar](sample/seg2.png)
 
 - 下为斗破苍穹的生成样例，使用约50M参数的GPT2以32Batch Size在16MB斗破苍穹小说内容上训练得到。此处[SEP]表示换行。
 
