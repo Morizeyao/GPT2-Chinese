@@ -128,6 +128,7 @@ def main():
         model = DataParallel(model)
         multi_gpu = True
     print('starting training')
+    running_loss = 0
     for epoch in range(epochs):
         print('epoch {}'.format(epoch + 1))
         now = datetime.now()
