@@ -56,11 +56,15 @@ def main():
     parser.add_argument('--num_pieces', default=100, type=int, required=False, help='将训练语料分成多少份')
     parser.add_argument('--output_dir', default='model/', type=str, required=False, help='模型输出路径')
     parser.add_argument('--pretrained_model', default='', type=str, required=False, help='模型训练起点路径')
+    parser.add_argument('--segment', action='store_true', help='中文以词为单位')
 
     args = parser.parse_args()
     print('args:\n' + args.__repr__())
 
-    from tokenizations import tokenization_bert
+    if args.segment:
+        from tokenizations import tokenization_bert_word_level as tokenization_bert
+    else:
+        from tokenizations import tokenization_bert
 
     os.environ["CUDA_VISIBLE_DEVICES"] = args.device  # 此处设置程序使用哪些显卡
     model_config = pytorch_transformers.modeling_gpt2.GPT2Config.from_json_file(args.model_config)
