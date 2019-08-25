@@ -63,7 +63,6 @@ def main():
     parser.add_argument('--output_dir', default='model/', type=str, required=False, help='模型输出路径')
     parser.add_argument('--pretrained_model', default='', type=str, required=False, help='模型训练起点路径')
     parser.add_argument('--writer_dir', default='tensorboard_summary/', type=str, required=False, help='Tensorboard路径')
-    parser.add_argument('--no_wordpiece', action='store_true', help='不做word piece切词')
     parser.add_argument('--segment', action='store_true', help='中文以词为单位')
     parser.add_argument('--bpe_token', action='store_true', help='subword')
     parser.add_argument('--encoder_json', default="tokenizations/encoder.json", type=str, help="encoder.json")
@@ -72,9 +71,7 @@ def main():
     args = parser.parse_args()
     print('args:\n' + args.__repr__())
 
-    if args.no_wordpiece:
-        from tokenizations import tokenization_bert_without_wordpiece as tokenization_bert
-    elif args.segment:
+    if args.segment:
         from tokenizations import tokenization_bert_word_level as tokenization_bert
     else:
         from tokenizations import tokenization_bert
