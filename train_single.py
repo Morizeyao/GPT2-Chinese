@@ -15,22 +15,29 @@ from tqdm import tqdm
 
 
 def build_files(raw_data_path, tokenized_data_path, full_tokenizer, num_pieces):
+    if ppd.is_default_file_type(): #是否采用默认json类型，默认编码为utf-8
+      if ppd.DEFAULT_FILE_TYPE in data_path:
+        with open(data_path, 'r', encoding='utf8') as f:
+          print('reading lines')
+          lines = json.load(f)
+          lines = [line.replace('\n', ' [SEP] ') for line in lines]  # 用[SEP]表示换行, 段落之间使用SEP表示段落结束
+      else:
+        raise Exception("请使用json文件类型，或者自定义文件类型，请看pre_process_data.py文件load方法")
+    else: #自定义数据源的，调用pre_process_data.py中的load方法
+      lines= ppd.load()
+      all_len = len(lines)
+    single = ''.join(lines)
+    len_single = len(single)
     if not os.path.exists(tokenized_data_path):
         os.mkdir(tokenized_data_path)
-    with open(raw_data_path, 'r', encoding='utf8') as f:
-        print('reading lines')
-        lines = json.load(f)
-        lines = [line.replace('\n', ' [SEP] ') for line in lines]  # 用[SEP]表示换行
-        single = ''.join(lines)
-        len_single = len(single)
-        for i in tqdm(range(num_pieces)):
-            single_ids = full_tokenizer.convert_tokens_to_ids(
-                full_tokenizer.tokenize(single[len_single // num_pieces * i: len_single // num_pieces * (i + 1)]))
-            with open(tokenized_data_path + 'tokenized_train_{}.txt'.format(i), 'w') as f:
-                for id in single_ids[:-1]:
-                    f.write(str(id) + ' ')
-                f.write(str(single_ids[-1]))
-                f.write('\n')
+    for i in tqdm(range(num_pieces)):
+        single_ids = full_tokenizer.convert_tokens_to_ids(
+            full_tokenizer.tokenize(single[len_single // num_pieces * i: len_single // num_pieces * (i + 1)]))
+        with open(tokenized_data_path + 'tokenized_train_{}.txt'.format(i), 'w') as f:
+            for id in single_ids[:-1]:
+                f.write(str(id) + ' ')
+            f.write(str(single_ids[-1]))
+            f.write('\n')
 
     print('finish')
 
