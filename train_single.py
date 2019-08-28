@@ -8,6 +8,7 @@ import numpy as np
 from datetime import datetime
 from torch.nn import DataParallel
 from tqdm import tqdm
+import pre_process_data as ppd
 
 '''
 如果训练材料是全部堆在一起不分篇章的话用这个文件
