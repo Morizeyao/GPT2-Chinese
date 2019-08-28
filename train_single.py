@@ -49,7 +49,7 @@ def main():
     parser.add_argument('--warmup_steps', default=2000, type=int, required=False, help='warm up步数')
     parser.add_argument('--log_step', default=1, type=int, required=False, help='多少步汇报一次loss')
     parser.add_argument('--stride', default=768, type=int, required=False, help='训练时取训练数据的窗口步长')
-    parser.add_argument('--gradient_accumulation', default=1, type=str, required=False, help='梯度积累')
+    parser.add_argument('--gradient_accumulation', default=1, type=int, required=False, help='梯度积累')
     parser.add_argument('--fp16', action='store_true', help='混合精度')
     parser.add_argument('--fp16_opt_level', default='O1', type=str, required=False)
     parser.add_argument('--max_grad_norm', default=1.0, type=float, required=False)
