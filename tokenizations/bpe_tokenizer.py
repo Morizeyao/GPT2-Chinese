@@ -2,7 +2,22 @@
 from https://github.com/openai/gpt-2/, changed for chinese
 """
 import json
+import os
+import sentencepiece as spm
+"""
+SentencePiece is an unsupervised text tokenizer and detokenizer mainly for Neural Network-based text generation 
+systems where the vocabulary size is predetermined prior to the neural model training. SentencePiece implements 
+subword units (e.g., byte-pair-encoding (BPE) [Sennrich et al.]) and unigram language model [Kudo.]) with the 
+extension of direct training from raw sentences. SentencePiece allows us to make a purely end-to-end 
+system that does not depend on language-specific pre/postprocessing.
+https://github.com/google/sentencepiece
 
+pip install sentencepiece
+
+or  git clone https://github.com/google/sentencepiece.git
+python setup.py install
+
+"""
 
 def get_pairs(word):
     pairs = set()
@@ -75,18 +90,52 @@ class Encoder:
 
     def convert_tokens_to_ids(self, tokens):
         return [self.encoder.get(token, 1) for token in tokens]
+    
+class Encoder_SP:
+    def __init__(self, model_path):
+        self.sp = spm.SentencePieceProcessor()
+        self.sp.Load(model_path)
+        
+
+    def encode(self, text):
+        """
+        text="...."
+        """
+        return self.sp.EncodeAsIds(text)
 
 
+    def decode(self, tokens):
+        """
+        tokens=[x1,x2,...]
+        """
+        text = [int(token) for token in tokens]
+        #print(text)
+        return self.sp.DecodeIds(text)
+
+    def tokenize(self, text):
+        return self.sp.EncodeAsPieces(text)
+
+    def convert_tokens_to_ids(self, tokens):
+        return [self.sp.PieceToId(token) for token in tokens]
+    
 def get_encoder(encoder_file, bpe_file):
-    with open(encoder_file, 'r', encoding="utf-8") as f:
-        encoder = json.load(f)
-    with open(bpe_file, 'r', encoding="utf-8") as f:
-        bpe_data = f.read()
-    bpe_merges = [tuple(merge_str.split()) for merge_str in bpe_data.split('\n')[1:-1]]
-    return Encoder(
-        encoder=encoder,
-        bpe_merges=bpe_merges,
-    )
+    
+    #以下是为了同一个函数入兼容sentencepiece 
+    filepath, filename = os.path.split(encoder_file)
+    shotname, extension = os.path.splitext(filename)
+    
+    if(".model" == extension) and (bpe_file == ""):
+        return Encoder_SP(encoder_path)
+    else:
+        with open(encoder_file, 'r', encoding="utf-8") as f:
+            encoder = json.load(f)
+        with open(bpe_file, 'r', encoding="utf-8") as f:
+            bpe_data = f.read()
+        bpe_merges = [tuple(merge_str.split()) for merge_str in bpe_data.split('\n')[1:-1]]
+        return Encoder(
+            encoder=encoder,
+            bpe_merges=bpe_merges,
+        )
 
 
 
