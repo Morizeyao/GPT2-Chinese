@@ -15,10 +15,13 @@
 
 ## 使用方法
 
-- 在项目根目录建立data文件夹。将训练语料以train.json为名放入data目录中。train.json里是一个json列表，列表的每个元素都分别是一篇要训练的文章。
+- 在项目根目录建立data文件夹。将训练语料以train.json为名放入data目录中。train.json里是一个json列表，列表的每个元素都分别是一篇要训练的文章。可以自定义文件类型，包括txt，csv，datasources(db)。
 - 运行train.py文件，勾选 --raw ，会自动预处理数据。
-- 预处理完成之后，直接运行train.py文件，即可开始训练。
+- 预处理完成之后，会自动执行训练。
 
+### 自定义文件类型或数据源
+1. 修改pre_process_data.py文件中的is_default_file_type()方法，返回值更改为False。
+2. 覆写pre_process_data.py文件中的load()方法，具体示例看文件已注释的方法。
 ## 文件结构
 
 - generate.py 与 train.py 分别是生成与训练的脚本。
