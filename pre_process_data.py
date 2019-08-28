@@ -1,9 +1,11 @@
 DEFAULT_FILE_TYPE = ".json"
 
+
 # 默认采用json文件作为输入的文件类型
 # 如果自定义了文件类型，或者数据源，请return False
 def is_default_file_type():
-  return True
+    return True
+
 
 # 示例方法
 # def load():
@@ -19,4 +21,4 @@ def is_default_file_type():
 # 自定文件类型或者数据源必须实现此方法
 # 最终返回列表，具体参考上面示例
 def load():
- pass
+    pass

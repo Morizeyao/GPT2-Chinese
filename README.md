@@ -4,6 +4,7 @@
 
 - Chinese version of GPT2 training code, using BERT tokenizer or BPE tokenizer. It is based on the extremely awesome repository from HuggingFace team [Pytorch-Transformers](https://github.com/huggingface/pytorch-transformers). Can write poems, news, novels, or train general language models. Support char level, word level and BPE level. Support large training corpus.
 - 中文的GPT2训练代码，使用BERT的Tokenizer或GPT2自带的BPE Tokenizer（感谢[fengzuo97](https://github.com/fengzuo97)的支持)。可以写诗，新闻，小说，或是训练通用语言模型。支持字为单位或是分词模式或是BPE模式。支持大语料训练。
+- 稳定版请参考Stable branch，最新代码请参考Master branch。
 
 ## UPDATE 8.24
 
@@ -20,8 +21,10 @@
 - 预处理完成之后，会自动执行训练。
 
 ### 自定义文件类型或数据源
+
 1. 修改pre_process_data.py文件中的is_default_file_type()方法，返回值更改为False。
 2. 覆写pre_process_data.py文件中的load()方法，具体示例看文件已注释的方法。
+
 ## 文件结构
 
 - generate.py 与 train.py 分别是生成与训练的脚本。
