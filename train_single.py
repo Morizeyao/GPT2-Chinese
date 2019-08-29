@@ -17,8 +17,8 @@ import pre_process_data as ppd
 
 def build_files(raw_data_path, tokenized_data_path, full_tokenizer, num_pieces):
     if ppd.is_default_file_type():  # 是否采用默认json类型，默认编码为utf-8
-        if ppd.DEFAULT_FILE_TYPE in data_path:
-            with open(data_path, 'r', encoding='utf8') as f:
+        if ppd.DEFAULT_FILE_TYPE in raw_data_path:
+            with open(raw_data_path, 'r', encoding='utf8') as f:
                 print('reading lines')
                 lines = json.load(f)
                 lines = [line.replace('\n', ' [SEP] ') for line in lines]  # 用[SEP]表示换行, 段落之间使用SEP表示段落结束
