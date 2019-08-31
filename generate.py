@@ -96,6 +96,27 @@ def sample_sequence(model, length, context, num_samples=1, temperature=1, top_k=
     return generated
 
 
+def fast_sample_sequence(model, ids, length, temperature, top_k, top_p, device):
+    inputs = torch.LongTensor(ids).view(1, -1).to(device)
+    if len(ids) > 1:
+        _, past = model(inputs[:, :-1], None)[:2]
+        prev = inputs[:, -1].view(1, -1)
+    else:
+        past = None
+        prev = inputs
+    generate = ids
+    with torch.no_grad():
+        for i in range(length):
+            output = model(prev, past=past)
+            output, past = output[:2]
+            output = output[-1].squeeze(0) / temperature
+            filtered_logits = top_k_top_p_filtering(output, top_k=top_k, top_p=top_p)
+            next_token = torch.multinomial(torch.softmax(filtered_logits, dim=-1), num_samples=1)
+            generate.append(next_token.item())
+            prev = next_token.view(1, 1)
+    return generate
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--device', default='0,1,2,3', type=str, required=False, help='生成设备')
