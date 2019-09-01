@@ -180,9 +180,6 @@ def main():
             while start_point < len(tokens) - n_ctx:
                 samples.append(tokens[start_point: start_point + n_ctx])
                 start_point += stride
-            start_point -= stride
-            last = tokens[start_point + n_ctx:]
-            last.extend([full_tokenizer.convert_tokens_to_ids(['[PAD]']) * (n_ctx - len(last))])
             random.shuffle(samples)
             for step in range(len(samples) // batch_size):  # drop last
 
