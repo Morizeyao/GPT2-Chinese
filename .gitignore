@@ -5,4 +5,4 @@ cache/.DS_Store
 .idea/misc.xml
 .idea/GPT2-Chinese.iml
 data/
-./samples.txt
+.samples.txt

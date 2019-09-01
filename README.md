@@ -25,6 +25,15 @@
 1. 修改pre_process_data.py文件中的is_default_file_type()方法，返回值更改为False。
 2. 覆写pre_process_data.py文件中的load()方法，具体示例看文件已注释的方法。
 
+### 生成文本
+
+``` bash
+python ./generate.py --length=50 --nsamples=4 --prefix=xxx --fast_pattern --save_samples --save_samples_path=/mnt/xx
+```
+- **--fast_pattern**：如果生成的length参数比较小，速度基本无差别，我个人测试length=250时，快了2秒，所以如果不添加**--fast_pattern**，那么默认不采用fast_pattern方式。
+- **--save_samples**：默认将输出样本直接打印到控制台，传递此参数，将保存在根目录下的**samples.txt**.
+- **--save_samples_path**：可自行指定保存的目录，默认可递归创建多级目录，不可以传递文件名称，文件名称默认为**samples.txt**。
+
 ## 文件结构
 
 - generate.py 与 train.py 分别是生成与训练的脚本。
