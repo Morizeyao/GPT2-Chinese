@@ -73,7 +73,7 @@ def sample_sequence(model,context,length,temperature=1, top_k=0, top_p=0.0,devic
     context = context.unsqueeze(0)
     generated = context
     with torch.no_grad():
-        for _ in range(length):
+        for _ in trange(length):
             inputs = {'input_ids': generated}
             outputs = model(
                 **inputs)  # Note: we could also use 'past' with GPT-2/Transfo-XL/XLNet (cached hidden-states)
@@ -94,7 +94,7 @@ def fast_sample_sequence(model,context,length,temperature=1, top_k=0, top_p=0.0,
         prev = inputs
     generate = [] + context
     with torch.no_grad():
-        for i in range(length):
+        for i in trange(length):
             output = model(prev, past=past)
             output, past = output[:2]
             output = output[-1].squeeze(0) / temperature
