@@ -68,43 +68,31 @@ def top_k_top_p_filtering(logits, top_k=0, top_p=0.0, filter_value=-float('Inf')
     return logits
 
 
-def sample_sequence(model, length, context, num_samples=1, temperature=1, top_k=0, top_p=0.0, is_xlnet=False,
-                    device='cpu'):
+def sample_sequence(model,context,length,temperature=1, top_k=0, top_p=0.0,device='cpu'):
     context = torch.tensor(context, dtype=torch.long, device=device)
-    context = context.unsqueeze(0).repeat(num_samples, 1)
+    context = context.unsqueeze(0)
     generated = context
     with torch.no_grad():
-        for _ in trange(length):
-
+        for _ in range(length):
             inputs = {'input_ids': generated}
-            if is_xlnet:
-                # XLNet is a direct (predict same token, not next token) and bi-directional model by default
-                # => need one additional dummy token in the input (will be masked), attention mask and target mapping (see model docstring)
-                input_ids = torch.cat((generated, torch.zeros((1, 1), dtype=torch.long, device=device)), dim=1)
-                perm_mask = torch.zeros((1, input_ids.shape[1], input_ids.shape[1]), dtype=torch.float, device=device)
-                perm_mask[:, :, -1] = 1.0  # Previous tokens don't see last token
-                target_mapping = torch.zeros((1, 1, input_ids.shape[1]), dtype=torch.float, device=device)
-                target_mapping[0, 0, -1] = 1.0  # predict last token
-                inputs = {'input_ids': input_ids, 'perm_mask': perm_mask, 'target_mapping': target_mapping}
-
             outputs = model(
                 **inputs)  # Note: we could also use 'past' with GPT-2/Transfo-XL/XLNet (cached hidden-states)
             next_token_logits = outputs[0][0, -1, :] / temperature
             filtered_logits = top_k_top_p_filtering(next_token_logits, top_k=top_k, top_p=top_p)
             next_token = torch.multinomial(F.softmax(filtered_logits, dim=-1), num_samples=1)
             generated = torch.cat((generated, next_token.unsqueeze(0)), dim=1)
-    return generated
+    return generated.tolist()[0]
 
 
-def fast_sample_sequence(model, ids, length, temperature, top_k, top_p, device):
-    inputs = torch.LongTensor(ids).view(1, -1).to(device)
-    if len(ids) > 1:
+def fast_sample_sequence(model,context,length,temperature=1, top_k=0, top_p=0.0,device='cpu'):
+    inputs = torch.LongTensor(context).view(1, -1).to(device)
+    if len(context) > 1:
         _, past = model(inputs[:, :-1], None)[:2]
         prev = inputs[:, -1].view(1, -1)
     else:
         past = None
         prev = inputs
-    generate = ids
+    generate = [] + context
     with torch.no_grad():
         for i in range(length):
             output = model(prev, past=past)
@@ -115,6 +103,14 @@ def fast_sample_sequence(model, ids, length, temperature, top_k, top_p, device):
             generate.append(next_token.item())
             prev = next_token.view(1, 1)
     return generate
+
+#通过命令行参数--fast_pattern，指定模式
+def generate(model,context,length,temperature=1, top_k=0, top_p=0.0,device='cpu',is_fast_pattern=False):
+    if is_fast_pattern:
+        return fast_sample_sequence(model,context,length,temperature=temperature, top_k=top_k, top_p=top_p,device=device)
+    else:
+        return sample_sequence(model,context,length,temperature=temperature, top_k=top_k, top_p=top_p,device=device)
+
 
 
 def main():
@@ -133,6 +129,9 @@ def main():
     parser.add_argument('--prefix', default='萧炎', type=str, required=False, help='生成文章的开头')
     parser.add_argument('--no_wordpiece', action='store_true', help='不做word piece切词')
     parser.add_argument('--segment', action='store_true', help='中文以词为单位')
+    parser.add_argument('--fast_pattern',action='store_true',help='采用更加快的方式生成文本')
+    parser.add_argument('--save_samples',action='store_true',help='保存产生的样本')
+    parser.add_argument('--save_samples_path',default='.',type=str,required=False,help="保存样本的路径")
 
     args = parser.parse_args()
     print('args:\n' + args.__repr__())
@@ -163,36 +162,46 @@ def main():
         length = model.config.n_ctx // 2
     elif length > model.config.n_ctx:
         raise ValueError("Can't get samples longer than window size: %s" % model.config.n_ctx)
-
+    if args.save_samples:
+        if not os.path.exists(args.save_samples_path):
+            os.makedirs(args.save_samples_path)
+        samples_file = open(args.save_samples_path + '/samples.txt','w',encoding='utf8')
     while True:
         raw_text = args.prefix
         context_tokens = tokenizer.convert_tokens_to_ids(tokenizer.tokenize(raw_text))
         generated = 0
         for _ in range(nsamples // batch_size):
-            out = sample_sequence(
-                model=model, length=length,
+            out = generate(
+                model=model, 
                 context=context_tokens,
+                length=length,
+                is_fast_pattern=args.fast_pattern,
                 temperature=temperature, top_k=topk, top_p=topp, device=device
             )
-            out = out.tolist()
-
             for i in range(batch_size):
                 generated += 1
-                text = tokenizer.convert_ids_to_tokens(out[0])
-
+                text = tokenizer.convert_ids_to_tokens(out)
                 for i, item in enumerate(text[:-1]):  # 确保英文前后有空格
                     if is_word(item) and is_word(text[i + 1]):
                         text[i] = item + ' '
-
                 for i, item in enumerate(text):
                     if item == '[MASK]':
                         text[i] = ''
                     if item == '[CLS]' or item == '[SEP]':
                         text[i] = '\n'
-                print("=" * 40 + " SAMPLE " + str(generated) + " " + "=" * 40)
+                info = "=" * 40 + " SAMPLE " + str(generated) + " " + "=" * 40 + "\n"
+                print(info)
                 text = ''.join(text).replace('##', '').strip()
                 print(text)
+                if args.save_samples:
+                    samples_file.write(info)
+                    samples_file.write(text)
+                    samples_file.write('\n')
+                    samples_file.write('='*90)
+                    samples_file.write('\n'*2)
         print("=" * 80)
+        if generated == nsamples:
+            break
 
 
 if __name__ == '__main__':

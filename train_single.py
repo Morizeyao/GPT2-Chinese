@@ -26,7 +26,6 @@ def build_files(raw_data_path, tokenized_data_path, full_tokenizer, num_pieces):
             raise Exception("请使用json文件类型，或者自定义文件类型，请看pre_process_data.py文件load方法")
     else:  # 自定义数据源的，调用pre_process_data.py中的load方法
         lines = ppd.load()
-        all_len = len(lines)
     single = ''.join(lines)
     len_single = len(single)
     if not os.path.exists(tokenized_data_path):

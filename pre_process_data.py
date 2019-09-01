@@ -12,7 +12,6 @@ def is_default_file_type():
 #     #根据文件编码类型，选择相应编码
 #     with open("/user/npl/gpt/data/train.txt", 'r', encoding='gbk') as f:
 #       print('reading lines')
-#       #如果文件编码是GBK，才进行转换，否则lines = f.readlines()
 #       lines = f.readlines();
 #       lines = [line.replace('\n', ' [SEP] ') for line in lines]  # 用[SEP]表示换行, 段落之间使用SEP表示段落结束
 #     return lines
