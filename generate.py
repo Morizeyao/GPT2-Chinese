@@ -68,7 +68,7 @@ def top_k_top_p_filtering(logits, top_k=0, top_p=0.0, filter_value=-float('Inf')
     return logits
 
 
-def sample_sequence(model,context,length,temperature=1, top_k=0, top_p=0.0,device='cpu'):
+def sample_sequence(model, context, length, temperature=1, top_k=0, top_p=0.0, device='cpu'):
     context = torch.tensor(context, dtype=torch.long, device=device)
     context = context.unsqueeze(0)
     generated = context
@@ -84,7 +84,7 @@ def sample_sequence(model,context,length,temperature=1, top_k=0, top_p=0.0,devic
     return generated.tolist()[0]
 
 
-def fast_sample_sequence(model,context,length,temperature=1, top_k=0, top_p=0.0,device='cpu'):
+def fast_sample_sequence(model, context, length, temperature=1, top_k=0, top_p=0.0, device='cpu'):
     inputs = torch.LongTensor(context).view(1, -1).to(device)
     if len(context) > 1:
         _, past = model(inputs[:, :-1], None)[:2]
@@ -104,13 +104,14 @@ def fast_sample_sequence(model,context,length,temperature=1, top_k=0, top_p=0.0,
             prev = next_token.view(1, 1)
     return generate
 
-#通过命令行参数--fast_pattern，指定模式
-def generate(model,context,length,temperature=1, top_k=0, top_p=0.0,device='cpu',is_fast_pattern=False):
-    if is_fast_pattern:
-        return fast_sample_sequence(model,context,length,temperature=temperature, top_k=top_k, top_p=top_p,device=device)
-    else:
-        return sample_sequence(model,context,length,temperature=temperature, top_k=top_k, top_p=top_p,device=device)
 
+# 通过命令行参数--fast_pattern，指定模式
+def generate(model, context, length, temperature=1, top_k=0, top_p=0.0, device='cpu', is_fast_pattern=False):
+    if is_fast_pattern:
+        return fast_sample_sequence(model, context, length, temperature=temperature, top_k=top_k, top_p=top_p,
+                                    device=device)
+    else:
+        return sample_sequence(model, context, length, temperature=temperature, top_k=top_k, top_p=top_p, device=device)
 
 
 def main():
@@ -129,9 +130,9 @@ def main():
     parser.add_argument('--prefix', default='萧炎', type=str, required=False, help='生成文章的开头')
     parser.add_argument('--no_wordpiece', action='store_true', help='不做word piece切词')
     parser.add_argument('--segment', action='store_true', help='中文以词为单位')
-    parser.add_argument('--fast_pattern',action='store_true',help='采用更加快的方式生成文本')
-    parser.add_argument('--save_samples',action='store_true',help='保存产生的样本')
-    parser.add_argument('--save_samples_path',default='.',type=str,required=False,help="保存样本的路径")
+    parser.add_argument('--fast_pattern', action='store_true', help='采用更加快的方式生成文本')
+    parser.add_argument('--save_samples', action='store_true', help='保存产生的样本')
+    parser.add_argument('--save_samples_path', default='.', type=str, required=False, help="保存样本的路径")
 
     args = parser.parse_args()
     print('args:\n' + args.__repr__())
@@ -159,20 +160,20 @@ def main():
     model.eval()
 
     if length == -1:
-        length = model.config.n_ctx // 2
-    elif length > model.config.n_ctx:
+        length = model.config.n_ctx - len(args.prefix)
+    elif length > model.config.n_ctx - len(args.prefix):
         raise ValueError("Can't get samples longer than window size: %s" % model.config.n_ctx)
     if args.save_samples:
         if not os.path.exists(args.save_samples_path):
             os.makedirs(args.save_samples_path)
-        samples_file = open(args.save_samples_path + '/samples.txt','w',encoding='utf8')
+        samples_file = open(args.save_samples_path + '/samples.txt', 'w', encoding='utf8')
     while True:
         raw_text = args.prefix
         context_tokens = tokenizer.convert_tokens_to_ids(tokenizer.tokenize(raw_text))
         generated = 0
         for _ in range(nsamples // batch_size):
             out = generate(
-                model=model, 
+                model=model,
                 context=context_tokens,
                 length=length,
                 is_fast_pattern=args.fast_pattern,
@@ -197,8 +198,8 @@ def main():
                     samples_file.write(info)
                     samples_file.write(text)
                     samples_file.write('\n')
-                    samples_file.write('='*90)
-                    samples_file.write('\n'*2)
+                    samples_file.write('=' * 90)
+                    samples_file.write('\n' * 2)
         print("=" * 80)
         if generated == nsamples:
             break
