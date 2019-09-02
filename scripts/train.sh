@@ -1,4 +1,5 @@
 python train.py \
+  --model_config config/model_config_small.json \
   --tokenized_data_path data/tokenized/ \
   --tokenizer_path cache/vocab_small.txt \
   --raw_data_path data/train.json \
