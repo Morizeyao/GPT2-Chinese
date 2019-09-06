@@ -202,6 +202,9 @@ def main():
                     samples_file.write('\n' * 2)
         print("=" * 80)
         if generated == nsamples:
+            # close file when finish writing.
+            if args.save_samples:
+                samples_file.close()
             break
 
 
