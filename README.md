@@ -121,4 +121,8 @@ python ./generate.py --length=50 --nsamples=4 --prefix=xxx --fast_pattern --save
 ![avatar](sample/full3.jpg)
 ![avatar](sample/full4.jpg)
 
-
+- 下為金庸武俠小說的生成樣例。模型大小約 82M，語料 50 MB，Batch size 16。提供[文章直觀介紹 GPT-2 以及如何視覺化自注意力機制](https://leemeng.tw/gpt2-language-model-generate-chinese-jing-yong-novels.html)。另提供 [Colab 筆記本與模型](https://colab.research.google.com/drive/1MaT8-HUHfZkdCra0OqZEIr0IFCq0MJBx)供任何使用者一鍵生成新樣例。
+![avatar](sample/金庸_天龍八部.jpg)
+![avatar](sample/金庸_倚天屠龍記.jpg)
+![avatar](sample/金庸_鹿鼎記.jpg)
+![avatar](sample/金庸_神鵰俠侶.jpg)
