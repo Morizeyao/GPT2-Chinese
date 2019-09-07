@@ -26,7 +26,7 @@ def build_files(data_path, tokenized_data_path, num_pieces, full_tokenizer, min_
         lines = ppd.load()
     all_len = len(lines)
     if not os.path.exists(tokenized_data_path):
-        os.mkdir(tokenized_data_path)
+        os.makedirs(tokenized_data_path)
     for i in tqdm(range(num_pieces)):
         sublines = lines[all_len // num_pieces * i: all_len // num_pieces * (i + 1)]
         if i == num_pieces - 1:
@@ -72,6 +72,7 @@ def main():
     parser.add_argument('--writer_dir', default='tensorboard_summary/', type=str, required=False, help='Tensorboard路径')
     parser.add_argument('--segment', action='store_true', help='中文以词为单位')
     parser.add_argument('--bpe_token', action='store_true', help='subword')
+    parser.add_argument('--no_gpu', action='store_true', help='不使用GPU')
     parser.add_argument('--encoder_json', default="tokenizations/encoder.json", type=str, help="encoder.json")
     parser.add_argument('--vocab_bpe', default="tokenizations/vocab.bpe", type=str, help="vocab.bpe")
 
@@ -94,7 +95,7 @@ def main():
     else:
         full_tokenizer = tokenization_bert.BertTokenizer(vocab_file=args.tokenizer_path)
     full_tokenizer.max_len = n_ctx
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    device = 'cuda' if torch.cuda.is_available() and not args.no_gpu else 'cpu'
     print('using device:', device)
 
     raw_data_path = args.raw_data_path
@@ -177,14 +178,26 @@ def main():
             tokens = [int(token) for token in tokens]
             start_point = 0
             samples = []
-            while start_point < len(tokens) - n_ctx:
+            tokens_len = len(tokens)
+            while start_point < tokens_len - n_ctx:
                 samples.append(tokens[start_point: start_point + n_ctx])
                 start_point += stride
+            if start_point < tokens_len:
+                samples.append(tokens[tokens_len-n_ctx:])
             random.shuffle(samples)
-            for step in range(len(samples) // batch_size):  # drop last
+            samples_len = len(samples)
+            steps = samples_len // batch_size
+            if samples_len % batch_size != 0:
+                steps += 1
+            for step in range(steps): 
+                #  prepare data
+                s = step * batch_size
+                e = s + batch_size
+                if e > samples_len:
+                  e = samples_len
 
                 #  prepare data
-                batch = samples[step * batch_size: (step + 1) * batch_size]
+                batch = samples[s:e]
                 batch_labels = []
                 batch_inputs = []
                 for ids in batch:
