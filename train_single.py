@@ -152,14 +152,24 @@ def main():
             tokens = [int(token) for token in tokens]
             start_point = 0
             samples = []
-            while start_point < len(tokens) - n_ctx:
+            tokens_len = len(tokens)
+            while start_point < tokens_len - n_ctx:
                 samples.append(tokens[start_point: start_point + n_ctx])
                 start_point += stride
+            if start_point < tokens_len:
+                samples.append(tokens[tokens_len-n_ctx:])
             random.shuffle(samples)
-            for step in range(len(samples) // batch_size):
-
+            samples_len = len(samples)
+            steps = samples_len // batch_size
+            if samples_len % batch_size != 0:
+                steps += 1
+            for step in range(steps):
                 #  prepare data
-                batch = samples[step * batch_size: (step + 1) * batch_size]
+                s = step * batch_size
+                e = s + batch_size
+                if e > samples_len:
+                  e = samples_len
+                batch = samples[s:e]
                 batch_labels = []
                 batch_inputs = []
                 for ids in batch:

@@ -195,8 +195,6 @@ def main():
                 e = s + batch_size
                 if e > samples_len:
                   e = samples_len
-
-                #  prepare data
                 batch = samples[s:e]
                 batch_labels = []
                 batch_inputs = []
