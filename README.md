@@ -6,10 +6,6 @@
 - 中文的GPT2训练代码，使用BERT的Tokenizer或GPT2自带的BPE Tokenizer或Sentencepiece的BPE model（感谢[kangzhonghua](https://github.com/kangzhonghua)的贡献）。可以写诗，新闻，小说，或是训练通用语言模型。支持字为单位或是分词模式或是BPE模式。支持大语料训练。
 - 微信交流群：请加微信duzeyao拉你入群。
 
-## UPDATE 10.15
-
-- 由用户[JamesHujy](https://github.com/JamesHujy)根据本仓库改版代码训练得到的模型作为律诗与绝句后台，新版[九歌诗歌生成器](https://jiuge.thunlp.cn/lvshi.html)已经上线。
-
 ## 项目状态
 
 - 目前项目主要架构已经稳定。如发现任何bug或是有功能意见与改进欢迎提交Issue，PR或是联系作者。
