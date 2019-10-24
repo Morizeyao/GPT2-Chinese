@@ -74,9 +74,10 @@ python ./generate.py --length=50 --nsamples=4 --prefix=xxx --fast_pattern --save
 ## 模型分享
 此处为热情大方的git友训练所得的模型文件，公开给所有朋友使用，同时也欢迎各位伙伴将自己训练完毕的模型公开于此处。
 
-模型名称 |  模型介绍 |分享者|链接地址1|链接地址2
---- | --- | --- | ---
-散文模型  |使用130MB的名家散文、情感散文和散文诗歌训练所得 。| [hughqiu](https://github.com/hughqiu "hughqiu") | [百度网盘【pp93】](https://pan.baidu.com/s/1C1i6lhxujsC_Swv-LSmWXw "百度网盘【pp93】")  | [GDrive](https://drive.google.com/drive/folders/1rJC4niJKMVwixUQkuL9k5teLRnEYTmUf?usp=sharing "GDrive")
+head|head|head
+-|-:|:-:|
+left|right|center
+left|right|center
 
 
 ## Demo
