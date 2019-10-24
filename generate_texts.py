@@ -153,7 +153,7 @@ def main():
 
     for i, title in enumerate(titles):
         for j in range(articles_per_title):
-            with open(save_path + str(i * j), 'w') as f:
+            with open(save_path + str(i) + '-' + str(j) + '.txt', 'w') as f:
                 context_tokens = tokenizer.convert_tokens_to_ids(tokenizer.tokenize(title))
                 generated = 0
                 out = sample_sequence(
@@ -182,7 +182,7 @@ def main():
                 text = ''.join(text).replace('##', '').strip()
                 # text = ''.join(text.split('\n')[:-1])
                 print(text)
-                f.write(text)
+                f.write(text + '\n')
                 print("=" * 80)
 
 
