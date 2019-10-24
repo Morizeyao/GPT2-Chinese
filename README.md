@@ -71,6 +71,11 @@ python ./generate.py --length=50 --nsamples=4 --prefix=xxx --fast_pattern --save
   howpublished = {\url{https://github.com/Morizeyao/GPT2-Chinese}},
 }
 ```
+## 模型分享
+###### 此处为热心大方的网友公开出他们所得的训练结果，供各位朋友使用。
+|  模型名称 |  模型介绍 |分享者|   |   |
+| ------------ | ------------ | ------------ | ------------ |
+| 散文模型  |使用130MB的名家散文、情感散文和散文诗歌训练所得 。| [hughqiu](https://github.com/hughqiu "hughqiu") | [百度网盘【pp93】](https://pan.baidu.com/s/1C1i6lhxujsC_Swv-LSmWXw "百度网盘【pp93】")  | [GDrive](https://drive.google.com/drive/folders/1rJC4niJKMVwixUQkuL9k5teLRnEYTmUf?usp=sharing "GDrive")  |
 
 ## Demo
 
@@ -106,3 +111,10 @@ python ./generate.py --length=50 --nsamples=4 --prefix=xxx --fast_pattern --save
 ![avatar](sample/金庸_倚天屠龍記.jpg)
 ![avatar](sample/金庸_鹿鼎記.jpg)
 ![avatar](sample/金庸_神鵰俠侶.jpg)
+
+-以下为文学散文的生成样例，由[hughqiu](https://github.com/hughqiu "hughqiu")贡献，模型已经分享于模型分享列表。语料130MB，Batch size 16，10层深度下训练10轮所得。
+![avatar](sample/散文1.png)
+![avatar](sample/散文2.png)
+![avatar](sample/散文3.png)
+
+
