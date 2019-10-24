@@ -72,7 +72,6 @@ python ./generate.py --length=50 --nsamples=4 --prefix=xxx --fast_pattern --save
 }
 ```
 ## 模型分享
-###### 此处为热心大方的网友公开出他们所得的训练结果，供各位朋友使用。
 |  模型名称 |  模型介绍 |分享者|   |   |
 | ------------ | ------------ | ------------ | ------------ |
 | 散文模型  |使用130MB的名家散文、情感散文和散文诗歌训练所得 。| [hughqiu](https://github.com/hughqiu "hughqiu") | [百度网盘【pp93】](https://pan.baidu.com/s/1C1i6lhxujsC_Swv-LSmWXw "百度网盘【pp93】")  | [GDrive](https://drive.google.com/drive/folders/1rJC4niJKMVwixUQkuL9k5teLRnEYTmUf?usp=sharing "GDrive")  |
