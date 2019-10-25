@@ -3,7 +3,7 @@ import torch.nn.functional as F
 import os
 import argparse
 from tqdm import trange
-from pytorch_transformers import GPT2LMHeadModel
+from transformers import GPT2LMHeadModel
 
 
 def is_word(word):
