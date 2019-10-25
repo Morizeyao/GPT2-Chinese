@@ -6,6 +6,10 @@
 - 中文的GPT2训练代码，使用BERT的Tokenizer或GPT2自带的BPE Tokenizer或Sentencepiece的BPE model（感谢[kangzhonghua](https://github.com/kangzhonghua)的贡献）。可以写诗，新闻，小说，或是训练通用语言模型。支持字为单位或是分词模式或是BPE模式。支持大语料训练。
 - 微信交流群：请见Issue第一条。
 
+## UPDATE 10.25
+
+- 本项目第一个预训练模型已公布，为散文生成模型，具体可查看README模型分享部分。
+
 ## 项目状态
 
 - 目前项目主要架构已经稳定。如发现任何bug或是有功能意见与改进欢迎提交Issue，PR或是联系作者。
@@ -83,6 +87,11 @@ python ./generate.py --length=50 --nsamples=4 --prefix=xxx --fast_pattern --save
 
 ## Demo
 
+-以下为文学散文的生成样例，由[hughqiu](https://github.com/hughqiu "hughqiu")贡献，模型已经分享于模型分享列表。语料130MB，Batch size 16，10层深度下训练10轮所得。
+![avatar](sample/散文1.png)
+![avatar](sample/散文2.png)
+![avatar](sample/散文3.png)
+
 - 由用户[JamesHujy](https://github.com/JamesHujy)根据本仓库改版代码训练得到的模型作为律诗与绝句后台，新版[九歌诗歌生成器](https://jiuge.thunlp.cn/lvshi.html)已经上线。
 - 由[leemengtaiwan](https://github.com/leemengtaiwan)贡献，提供[文章直觀介紹 GPT-2 以及如何視覺化自注意力機制](https://leemeng.tw/gpt2-language-model-generate-chinese-jing-yong-novels.html)。另提供 [Colab 筆記本與模型](https://colab.research.google.com/drive/1MaT8-HUHfZkdCra0OqZEIr0IFCq0MJBx)供任何使用者一鍵生成新樣例。
 
@@ -116,9 +125,5 @@ python ./generate.py --length=50 --nsamples=4 --prefix=xxx --fast_pattern --save
 ![avatar](sample/金庸_鹿鼎記.jpg)
 ![avatar](sample/金庸_神鵰俠侶.jpg)
 
--以下为文学散文的生成样例，由[hughqiu](https://github.com/hughqiu "hughqiu")贡献，模型已经分享于模型分享列表。语料130MB，Batch size 16，10层深度下训练10轮所得。
-![avatar](sample/散文1.png)
-![avatar](sample/散文2.png)
-![avatar](sample/散文3.png)
 
 
