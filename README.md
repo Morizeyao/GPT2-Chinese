@@ -87,15 +87,15 @@ python ./generate.py --length=50 --nsamples=4 --prefix=xxx --fast_pattern --save
 
 ## Demo
 
--以下为文学散文的生成样例，由[hughqiu](https://github.com/hughqiu "hughqiu")贡献，模型已经分享于模型分享列表。语料130MB，Batch size 16，10层深度下训练10轮所得。
-![avatar](sample/散文1.png)
-![avatar](sample/散文2.png)
-![avatar](sample/散文3.png)
-
 - 由用户[JamesHujy](https://github.com/JamesHujy)根据本仓库改版代码训练得到的模型作为律诗与绝句后台，新版[九歌诗歌生成器](https://jiuge.thunlp.cn/lvshi.html)已经上线。
 - 由[leemengtaiwan](https://github.com/leemengtaiwan)贡献，提供[文章直觀介紹 GPT-2 以及如何視覺化自注意力機制](https://leemeng.tw/gpt2-language-model-generate-chinese-jing-yong-novels.html)。另提供 [Colab 筆記本與模型](https://colab.research.google.com/drive/1MaT8-HUHfZkdCra0OqZEIr0IFCq0MJBx)供任何使用者一鍵生成新樣例。
 
 ## 生成样例
+
+-以下为文学散文的生成样例，由[hughqiu](https://github.com/hughqiu "hughqiu")贡献，模型已经分享于模型分享列表。语料130MB，Batch size 16，10层深度下训练10轮所得。
+![avatar](sample/散文1.png)
+![avatar](sample/散文2.png)
+![avatar](sample/散文3.png)
 
 - 下为斗破苍穹的生成样例，使用约50M参数的GPT2以32Batch Size在16MB斗破苍穹小说内容上训练得到。此处[SEP]表示换行。
 
