@@ -221,7 +221,7 @@ def main():
                         step + 1,
                         piece_num,
                         epoch + 1,
-                        running_loss * gradient_accumulation / log_step))
+                        running_loss / log_step))
                     running_loss = 0
             piece_num += 1
 
