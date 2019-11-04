@@ -114,9 +114,7 @@ def main():
     args = parser.parse_args()
     print('args:\n' + args.__repr__())
 
-    if args.no_wordpiece:
-        from tokenizations import tokenization_bert_without_wordpiece as tokenization_bert
-    elif args.segment:
+    if args.segment:
         from tokenizations import tokenization_bert_word_level as tokenization_bert
     else:
         from tokenizations import tokenization_bert
