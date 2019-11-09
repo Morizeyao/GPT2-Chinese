@@ -6,6 +6,10 @@
 - 中文的GPT2训练代码，使用BERT的Tokenizer或Sentencepiece的BPE model（感谢[kangzhonghua](https://github.com/kangzhonghua)的贡献，实现BPE模式需要略微修改train.py的代码）。可以写诗，新闻，小说，或是训练通用语言模型。支持字为单位或是分词模式或是BPE模式（需要略微修改train.py的代码）。支持大语料训练。
 - 微信交流群：请见Issue第一条。
 
+## NEWS 11.9
+
+- [GPT2-ML](https://github.com/imcaspar/gpt2-ml)（与本项目无任何直接关联）已发布，包含1.5B模型。大家如有兴趣或需要可利用scripts文件夹内convert_from_tf_to_pytorch.py的脚本转换为本项目支持的Pytorch格式进行进一步训练或生成测试。
+
 ## UPDATE 10.25
 
 - 本项目第一个预训练模型已公布，为散文生成模型，具体可查看README模型分享部分。
