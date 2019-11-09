@@ -52,16 +52,15 @@ def main():
     parser.add_argument('--num_pieces', default=100, type=int, required=False, help='将训练语料分成多少份')
     parser.add_argument('--min_length', default=128, type=int, required=False, help='最短收录文章长度')
     parser.add_argument('--pretrained_model', default='', type=str, required=False, help='模型起点路径')
-    parser.add_argument('--no_wordpiece', action='store_true', help='不做word piece切词')
     parser.add_argument('--output_dir', default='eval_result/', type=str, required=False, help='结果输出路径')
 
     args = parser.parse_args()
     print('args:\n' + args.__repr__())
 
-    if args.no_wordpiece:
-        from tokenizations import tokenization_bert_without_wordpiece as tokenization_bert
-    else:
-        from tokenizations import tokenization_bert
+    # if args.no_wordpiece:
+    #     from tokenizations import tokenization_bert_without_wordpiece as tokenization_bert
+    # else:
+    from tokenizations import tokenization_bert
 
     os.environ["CUDA_VISIBLE_DEVICES"] = args.device  # 此处设置程序使用哪些显卡
 
