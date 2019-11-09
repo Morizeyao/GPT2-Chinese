@@ -8,7 +8,7 @@
 
 ## NEWS 11.9
 
-- [GPT2-ML](https://github.com/imcaspar/gpt2-ml)（与本项目无任何直接关联）已发布，包含1.5B模型。大家如有兴趣或需要可利用scripts文件夹内convert_from_tf_to_pytorch.py的脚本转换为本项目支持的Pytorch格式进行进一步训练或生成测试。
+- [GPT2-ML](https://github.com/imcaspar/gpt2-ml)（与本项目无任何直接关联）已发布，包含1.5B中文GPT2模型。大家如有兴趣或需要可利用scripts文件夹内convert_from_tf_to_pytorch.py的脚本转换为本项目支持的Pytorch格式进行进一步训练或生成测试。
 
 ## UPDATE 10.25
 
