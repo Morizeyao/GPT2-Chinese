@@ -125,7 +125,7 @@ def get_encoder(encoder_file, bpe_file):
     shotname, extension = os.path.splitext(filename)
     
     if(".model" == extension) and (bpe_file == ""):
-        return Encoder_SP(encoder_path)
+        return Encoder_SP(encoder_file)
     else:
         with open(encoder_file, 'r', encoding="utf-8") as f:
             encoder = json.load(f)
