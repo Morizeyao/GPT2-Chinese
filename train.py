@@ -19,7 +19,7 @@ def build_files(data_path, tokenized_data_path, num_pieces, full_tokenizer, min_
         lines = [line.replace('\n', ' [SEP] ') for line in lines]  # 用[SEP]表示换行, 段落之间使用SEP表示段落结束
     all_len = len(lines)
     if not os.path.exists(tokenized_data_path):
-        os.mkdir(tokenized_data_path)
+        os.makedirs(tokenized_data_path)
     for i in tqdm(range(num_pieces)):
         sublines = lines[all_len // num_pieces * i: all_len // num_pieces * (i + 1)]
         if i == num_pieces - 1:
@@ -52,7 +52,7 @@ def main():
     parser.add_argument('--batch_size', default=8, type=int, required=False, help='训练batch size')
     parser.add_argument('--lr', default=1.5e-4, type=float, required=False, help='学习率')
     parser.add_argument('--warmup_steps', default=2000, type=int, required=False, help='warm up步数')
-    parser.add_argument('--log_step', default=1, type=int, required=False, help='多少步汇报一次loss，设置为gradient accumulation的整数倍')
+    parser.add_argument('--log_step', default=1, type=int, required=False, help='多少步汇报一次loss')
     parser.add_argument('--stride', default=768, type=int, required=False, help='训练时取训练数据的窗口步长')
     parser.add_argument('--gradient_accumulation', default=1, type=int, required=False, help='梯度积累')
     parser.add_argument('--fp16', action='store_true', help='混合精度')
@@ -107,7 +107,6 @@ def main():
     min_length = args.min_length
     output_dir = args.output_dir
     tb_writer = SummaryWriter(log_dir=args.writer_dir)
-    assert log_step % gradient_accumulation == 0
 
     if not os.path.exists(output_dir):
         os.mkdir(output_dir)
@@ -155,8 +154,10 @@ def main():
         model = DataParallel(model, device_ids=[int(i) for i in args.device.split(',')])
         multi_gpu = True
     print('starting training')
-    overall_step = 0
-    running_loss = 0
+    current_step = 0
+    total_loss = 0
+    accumulation_loss = 0
+    accumulation_steps = 0
     for epoch in range(epochs):
         print('epoch {}'.format(epoch + 1))
         now = datetime.now()
@@ -178,7 +179,7 @@ def main():
                 samples.append(tokens[len(tokens)-n_ctx:])
             random.shuffle(samples)
             for step in range(len(samples) // batch_size):  # drop last
-
+                current_step += 1
                 #  prepare data
                 batch = samples[step * batch_size: (step + 1) * batch_size]
                 batch_inputs = []
@@ -194,9 +195,11 @@ def main():
                 #  get loss
                 if multi_gpu:
                     loss = loss.mean()
+
                 if gradient_accumulation > 1:
                     loss = loss / gradient_accumulation
 
+                accumulation_loss += loss.item()
                 #  loss backward
                 if fp16:
                     with amp.scale_loss(loss, optimizer) as scaled_loss:
@@ -207,23 +210,22 @@ def main():
                     torch.nn.utils.clip_grad_norm_(model.parameters(), max_grad_norm)
 
                 #  optimizer step
-                if (step + 1) % gradient_accumulation == 0:
-                    running_loss += loss.item()
+                if current_step % gradient_accumulation == 0:
+                    accumulation_steps += 1
+                    total_loss += accumulation_loss
+                    accumulation_loss = 0
                     optimizer.step()
                     optimizer.zero_grad()
                     scheduler.step()
-                    overall_step += 1
-                    if (overall_step + 1) % log_step == 0:
-                        tb_writer.add_scalar('loss', loss.item(), overall_step)
-                if (overall_step + 1) % log_step == 0:
-                    print('now time: {}:{}. Step {} of piece {} of epoch {}, loss {}'.format(
+                    if accumulation_steps % log_step == 0:
+                        avarage_loss = total_loss/accumulation_steps
+                        tb_writer.add_scalar('loss',avarage_loss,accumulation_steps)
+                        print('now time: {}:{}. Steps {} and pieces {} of epoch {}, loss {}'.format(
                         datetime.now().hour,
                         datetime.now().minute,
-                        step + 1,
+                        accumulation_steps,
                         piece_num,
-                        epoch + 1,
-                        running_loss * gradient_accumulation / log_step))
-                    running_loss = 0
+                        epoch + 1,avarage_loss))
             piece_num += 1
 
         print('saving model for epoch {}'.format(epoch + 1))

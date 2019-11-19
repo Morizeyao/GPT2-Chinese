@@ -22,7 +22,7 @@ def build_files(raw_data_path, tokenized_data_path, full_tokenizer, num_pieces):
     single = ''.join(lines)
     len_single = len(single)
     if not os.path.exists(tokenized_data_path):
-        os.mkdir(tokenized_data_path)
+        os.makedirs(tokenized_data_path)
     for i in tqdm(range(num_pieces)):
         single_ids = full_tokenizer.convert_tokens_to_ids(
             full_tokenizer.tokenize(single[len_single // num_pieces * i: len_single // num_pieces * (i + 1)]))
@@ -130,7 +130,10 @@ def main():
         model = DataParallel(model)
         multi_gpu = True
     print('starting training')
-    running_loss = 0
+    current_step = 0
+    total_loss = 0
+    accumulation_loss = 0
+    accumulation_steps = 0
     for epoch in range(epochs):
         print('epoch {}'.format(epoch + 1))
         now = datetime.now()
@@ -152,21 +155,17 @@ def main():
                 samples.append(tokens[len(tokens)-n_ctx:])
             random.shuffle(samples)
             for step in range(len(samples) // batch_size):
-
+                current_step += 1
                 #  prepare data
                 batch = samples[step * batch_size: (step + 1) * batch_size]
-                batch_labels = []
                 batch_inputs = []
                 for ids in batch:
-                    int_ids_for_labels = [int(x) for x in ids]
                     int_ids_for_inputs = [int(x) for x in ids]
-                    batch_labels.append(int_ids_for_labels)
                     batch_inputs.append(int_ids_for_inputs)
-                batch_labels = torch.tensor(batch_labels).long().to(device)
                 batch_inputs = torch.tensor(batch_inputs).long().to(device)
 
                 #  forward pass
-                outputs = model.forward(input_ids=batch_inputs, labels=batch_labels)
+                outputs = model.forward(input_ids=batch_inputs, labels=batch_inputs)
                 loss, logits = outputs[:2]
 
                 #  get loss
@@ -174,7 +173,7 @@ def main():
                     loss = loss.mean()
                 if gradient_accumulation > 1:
                     loss = loss / gradient_accumulation
-
+                accumulation_loss += loss.item()
                 #  loss backward
                 if fp16:
                     with amp.scale_loss(loss, optimizer) as scaled_loss:
@@ -185,20 +184,21 @@ def main():
                     torch.nn.utils.clip_grad_norm_(model.parameters(), max_grad_norm)
 
                 #  optimizer step
-                if (step + 1) % gradient_accumulation == 0:
-                    running_loss += loss.item()
+                if current_step % gradient_accumulation == 0:
+                    accumulation_steps += 1
+                    total_loss += accumulation_loss
+                    accumulation_loss = 0
                     optimizer.step()
                     optimizer.zero_grad()
                     scheduler.step()
-                if (step + 1) % log_step == 0:
-                    print('now time: {}:{}. Step {} of piece {} of epoch {}, loss {}'.format(
+                    if accumulation_steps % log_step == 0:
+                        avarage_loss = total_loss/accumulation_steps
+                        print('now time: {}:{}. Steps {} and pieces {} of epoch {}, loss {}'.format(
                         datetime.now().hour,
                         datetime.now().minute,
-                        (step + 1) // gradient_accumulation,
+                        accumulation_steps,
                         piece_num,
-                        epoch + 1,
-                        running_loss / log_step))
-                    running_loss = 0
+                        epoch + 1,avarage_loss))
             piece_num += 1
 
         print('saving model for epoch {}'.format(epoch + 1))
