@@ -17,7 +17,6 @@
 ## 项目状态
 
 - 目前项目主要架构已经稳定。如发现任何bug或是有功能意见与改进欢迎提交Issue，PR或是联系作者。
-- 如使用梯度积累，loss计算可能存在bug。
 
 ## 使用方法
 
@@ -61,7 +60,7 @@ python ./generate.py --length=50 --nsamples=4 --prefix=xxx --fast_pattern --save
 
 ## FP16与Gradient Accumulation支持
 
-- 我在train.py文件中加入了fp16与gradient accumulation支持，如果你安装了apex并且知道fp16是什么的话，可以修改变量fp16=True来启用。但是目前fp16不收敛，原因不明。
+- 我在train.py文件中加入了fp16与gradient accumulation支持，如果你安装了apex并且知道fp16是什么的话，可以修改变量fp16=True来启用。但是目前fp16可能不收敛，原因不明。
 
 ## 联系作者
 
