@@ -50,7 +50,7 @@ python ./generate.py --length=50 --nsamples=4 --prefix=xxx --fast_pattern --save
 ## 注意
 
 - 本项目使用Bert的tokenizer处理中文字符。
-- 如果使用分词版的tokenizer，不需要自己事先分词，tokenizer会帮你分。
+- 如果不使用分词版的tokenizer，不需要自己事先分词，tokenizer会帮你分。
 - 如果使用分词版的tokenizer，最好先使用cache文件夹内的make_vocab.py文件建立针对你的语料的词表。
 - 模型需自行运算。各位如果完成了预训练的话欢迎进行交流。
 - 如果你的内存非常大或者语料较小的话，可以改掉train.py内build files内的对应代码，不做拆分直接预处理语料。
