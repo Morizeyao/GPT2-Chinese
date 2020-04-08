@@ -4,7 +4,14 @@
 
 - Chinese version of GPT2 training code, using BERT tokenizer or BPE tokenizer. It is based on the extremely awesome repository from HuggingFace team [Transformers](https://github.com/huggingface/transformers). Can write poems, news, novels, or train general language models. Support char level, word level and BPE level. Support large training corpus.
 - 中文的GPT2训练代码，使用BERT的Tokenizer或Sentencepiece的BPE model（感谢[kangzhonghua](https://github.com/kangzhonghua)的贡献，实现BPE模式需要略微修改train.py的代码）。可以写诗，新闻，小说，或是训练通用语言模型。支持字为单位或是分词模式或是BPE模式（需要略微修改train.py的代码）。支持大语料训练。
-- 微信交流群：请见Issue第一条。
+
+## NEWS 12.9.2019
+
+- 新项目[GPT2-chitchat](https://github.com/yangjianxin1/GPT2-chitchat)已发布，部分基于本项目代码。包含训练GPT2对话模型的代码与与训练模型，以及生成样例，欢迎大家参观。
+
+## NEWS 12.7.2019
+
+- 新项目[Decoders-Chinese-TF2.0](https://github.com/Morizeyao/Decoders-Chinese-TF2.0)同样支持GPT2的中文训练，在使用上更加简单，不易产生各种问题。目前还在测试阶段，欢迎大家提出意见。
 
 ## NEWS 11.9
 
@@ -16,8 +23,7 @@
 
 ## 项目状态
 
-- 目前项目主要架构已经稳定。如发现任何bug或是有功能意见与改进欢迎提交Issue，PR或是联系作者。
-- 如使用梯度积累，loss计算可能存在bug。
+- 在本项目公布时，中文的GPT2资源几乎为零，而现在情况已有所不同。其次项目功能已经基本稳定，因此目前本项目暂已停止更新。我写下这些代码的初衷是练习Pytorch的使用，即使后期做了一些填坑工作，难免还是有很多不成熟的地方，也请谅解。
 
 ## 使用方法
 
@@ -48,7 +54,7 @@ python ./generate.py --length=50 --nsamples=4 --prefix=xxx --fast_pattern --save
 ## 注意
 
 - 本项目使用Bert的tokenizer处理中文字符。
-- 如果使用分词版的tokenizer，不需要自己事先分词，tokenizer会帮你分。
+- 如果不使用分词版的tokenizer，不需要自己事先分词，tokenizer会帮你分。
 - 如果使用分词版的tokenizer，最好先使用cache文件夹内的make_vocab.py文件建立针对你的语料的词表。
 - 模型需自行运算。各位如果完成了预训练的话欢迎进行交流。
 - 如果你的内存非常大或者语料较小的话，可以改掉train.py内build files内的对应代码，不做拆分直接预处理语料。
@@ -61,7 +67,7 @@ python ./generate.py --length=50 --nsamples=4 --prefix=xxx --fast_pattern --save
 
 ## FP16与Gradient Accumulation支持
 
-- 我在train.py文件中加入了fp16与gradient accumulation支持，如果你安装了apex并且知道fp16是什么的话，可以修改变量fp16=True来启用。但是目前fp16不收敛，原因不明。
+- 我在train.py文件中加入了fp16与gradient accumulation支持，如果你安装了apex并且知道fp16是什么的话，可以修改变量fp16=True来启用。但是目前fp16可能不收敛，原因不明。
 
 ## 联系作者
 

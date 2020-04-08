@@ -207,23 +207,22 @@ def main():
                     torch.nn.utils.clip_grad_norm_(model.parameters(), max_grad_norm)
 
                 #  optimizer step
-                if (step + 1) % gradient_accumulation == 0:
+                if (overall_step + 1) % gradient_accumulation == 0:
                     running_loss += loss.item()
                     optimizer.step()
                     optimizer.zero_grad()
                     scheduler.step()
-                    overall_step += 1
-                    if (overall_step + 1) % log_step == 0:
-                        tb_writer.add_scalar('loss', loss.item(), overall_step)
                 if (overall_step + 1) % log_step == 0:
+                    tb_writer.add_scalar('loss', loss.item() * gradient_accumulation, overall_step)
                     print('now time: {}:{}. Step {} of piece {} of epoch {}, loss {}'.format(
                         datetime.now().hour,
                         datetime.now().minute,
                         step + 1,
                         piece_num,
                         epoch + 1,
-                        running_loss * gradient_accumulation / log_step))
+                        running_loss * gradient_accumulation / (log_step / gradient_accumulation)))
                     running_loss = 0
+                overall_step += 1
             piece_num += 1
 
         print('saving model for epoch {}'.format(epoch + 1))
