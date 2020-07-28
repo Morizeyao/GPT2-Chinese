@@ -127,6 +127,6 @@ sftp-config*.json
 *.ipynb
 *.pk
 .idea/
-data/
+# data/
 *.pt
 checkpoints/
