@@ -5,6 +5,10 @@
 - Chinese version of GPT2 training code, using BERT tokenizer or BPE tokenizer. It is based on the extremely awesome repository from HuggingFace team [Transformers](https://github.com/huggingface/transformers). Can write poems, news, novels, or train general language models. Support char level, word level and BPE level. Support large training corpus.
 - 中文的GPT2训练代码，使用BERT的Tokenizer或Sentencepiece的BPE model（感谢[kangzhonghua](https://github.com/kangzhonghua)的贡献，实现BPE模式需要略微修改train.py的代码）。可以写诗，新闻，小说，或是训练通用语言模型。支持字为单位或是分词模式或是BPE模式（需要略微修改train.py的代码）。支持大语料训练。
 
+## NEWS 08.11.2020
+
+- [CDial-GPT](https://github.com/thu-coai/CDial-GPT)(可用本代码载入)已发布。本项目包含一个经过严格清洗的大规模放开域中文对话数据集，本项目还包含在此数据集上训练的GPT对话预训练模型，以及生成样例，欢迎大家参观。
+
 ## NEWS 12.9.2019
 
 - 新项目[GPT2-chitchat](https://github.com/yangjianxin1/GPT2-chitchat)已发布，部分基于本项目代码。包含训练GPT2对话模型的代码与与训练模型，以及生成样例，欢迎大家参观。
