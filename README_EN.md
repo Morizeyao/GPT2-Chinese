@@ -37,7 +37,7 @@
 
 ### Generate text
 
-`` bash
+``` bash
 python . /generate.py --length=50 --nsamples=4 --prefix=xxx --fast_pattern --save_samples --save_samples_path=/mnt/xx
 ```
 - **--fast_pattern** (contributed by [LeeCP8](https://github.com/LeeCP8)): If the generated length parameter is relatively small, the speed is basically no difference, my personal test length = 250, faster by 2 seconds, so if you do not add--fast_pattern then fast_pattern is not used by default.
