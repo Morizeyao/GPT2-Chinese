@@ -5,6 +5,12 @@
 - Chinese version of GPT2 training code, using BERT tokenizer or BPE tokenizer. It is based on the extremely awesome repository from HuggingFace team [Transformers](https://github.com/huggingface/transformers). Can write poems, news, novels, or train general language models. Support char level, word level and BPE level. Support large training corpus.
 - 中文的GPT2训练代码，使用BERT的Tokenizer或Sentencepiece的BPE model（感谢[kangzhonghua](https://github.com/kangzhonghua)的贡献，实现BPE模式需要略微修改train.py的代码）。可以写诗，新闻，小说，或是训练通用语言模型。支持字为单位或是分词模式或是BPE模式（需要略微修改train.py的代码）。支持大语料训练。
 
+## UPDATE 11.03.2020
+
+- 本项目新增了古诗词GPT-2预训练模型。此模型由[UER-py](https://github.com/dbiir/UER-py)项目训练得到。欢迎大家使用。
+
+  在使用本模型进行生成时，需要在输入的文本前加入两个占位符，如：若要输入“梅山如积翠”，正确的格式为“[CLS]\[CLS]梅山如积翠”，后续会上传新的模型进行改进。
+
 ## NEWS 08.11.2020
 
 - [CDial-GPT](https://github.com/thu-coai/CDial-GPT)(可用本代码载入)已发布。本项目包含一个经过严格清洗的大规模放开域中文对话数据集，本项目还包含在此数据集上训练的GPT对话预训练模型，以及生成样例，欢迎大家参观。
@@ -92,10 +98,9 @@ python ./generate.py --length=50 --nsamples=4 --prefix=xxx --fast_pattern --save
 
 ## 模型分享
 |  模型名称 |   模型介绍|   分享者|  链接地址1 |  链接地址2 |
-| ------------ | ------------ | ------------ | ------------ | ------------ |
+| ------------ | :----------- | :----------- | :----------- | ------------ |
 | 散文模型  | 使用130MB的名家散文、情感散文和散文诗歌训练所得 。  |  [hughqiu](https://github.com/hughqiu "hughqiu") | [百度网盘【fpyu】](https://pan.baidu.com/s/1nbrW5iw34GRhoTin8uU2tQ)   | [GDrive](https://drive.google.com/drive/folders/1rJC4niJKMVwixUQkuL9k5teLRnEYTmUf?usp=sharing "GDrive") |
-
-
+| 诗词模型 | 使用180MB的约80万首古诗词训练所得。 | [hhou435](https://github.com/hhou435) | [百度网盘【4cn7】](https://pan.baidu.com/s/1XVS2JaQOEyoG1v4cZTrNJA) | [GDrive](https://drive.google.com/drive/folders/1ZG_OkRhFBF-uXu2l2cAVStwUnFc9vo3R?usp=sharing) |
 
 此处为热情大方的git友训练所得的模型文件，公开给所有朋友使用，同时也欢迎各位伙伴将自己训练完毕的模型公开于此处。
 
