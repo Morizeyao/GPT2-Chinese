@@ -10,8 +10,8 @@
 - 本项目新增了[通用中文GPT-2预训练模型](https://github.com/Morizeyao/GPT2-Chinese#%E6%A8%A1%E5%9E%8B%E5%88%86%E4%BA%AB)和[中文歌词GPT-2预训练模型](https://github.com/Morizeyao/GPT2-Chinese#%E6%A8%A1%E5%9E%8B%E5%88%86%E4%BA%AB)。模型由UER-py项目训练得到，欢迎大家使用。
 此外，模型上传到了Huggingface Model Hub中。更多模型的细节请参考[gpt2-base-chinese-cluecorpussmall](https://huggingface.co/uer/gpt2-base-chinese-cluecorpussmall)和[gpt2-chinese-lyric](https://huggingface.co/uer/gpt2-chinese-lyric)。
   
-在使用通用中文模型和中文歌词模型进行生成时，需要在输入的文本前加入一个起始符，如：若要输入“最美的不是下雨天，是曾与你躲过雨的屋檐”，正确的格式为“[CLS]最美的不是下雨天，是曾与你躲过雨的屋檐”。
-  
+  在使用通用中文模型和中文歌词模型进行生成时，需要在输入的文本前加入一个起始符，如：若要输入“最美的不是下雨天，是曾与你躲过雨的屋檐”，正确的格式为“[CLS]最美的不是下雨天，是曾与你躲过雨的屋檐”。
+
 
 ## UPDATE 11.03.2020
 
