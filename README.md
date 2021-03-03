@@ -7,10 +7,10 @@
 
 ## UPDATE 02.06.2021
 
-- 本项目新增了[通用中文GPT-2预训练模型](https://github.com/Morizeyao/GPT2-Chinese#%E6%A8%A1%E5%9E%8B%E5%88%86%E4%BA%AB)和[中文歌词GPT-2预训练模型](https://github.com/Morizeyao/GPT2-Chinese#%E6%A8%A1%E5%9E%8B%E5%88%86%E4%BA%AB)。模型由UER-py项目训练得到，欢迎大家使用。
-此外，模型上传到了Huggingface Model Hub中。更多模型的细节请参考[gpt2-base-chinese-cluecorpussmall](https://huggingface.co/uer/gpt2-base-chinese-cluecorpussmall)和[gpt2-chinese-lyric](https://huggingface.co/uer/gpt2-chinese-lyric)。
+- 本项目新增了[通用中文GPT-2预训练模型](https://github.com/Morizeyao/GPT2-Chinese#%E6%A8%A1%E5%9E%8B%E5%88%86%E4%BA%AB)、[通用中文GPT-2预训练小模型](https://github.com/Morizeyao/GPT2-Chinese#%E6%A8%A1%E5%9E%8B%E5%88%86%E4%BA%AB)、[中文歌词GPT-2预训练模型](https://github.com/Morizeyao/GPT2-Chinese#%E6%A8%A1%E5%9E%8B%E5%88%86%E4%BA%AB)和[文言文GPT-2预训练模型](https://github.com/Morizeyao/GPT2-Chinese#%E6%A8%A1%E5%9E%8B%E5%88%86%E4%BA%AB)。模型由UER-py项目训练得到，欢迎大家使用。
+此外，模型上传到了Huggingface Model Hub中。更多模型的细节请参考[gpt2-chinese-cluecorpussmall](https://huggingface.co/uer/gpt2-chinese-cluecorpussmall)、[gpt2-distil-chinese-cluecorpussmall](https://huggingface.co/uer/gpt2-distil-chinese-cluecorpussmall)、[gpt2-chinese-lyric](https://huggingface.co/uer/gpt2-chinese-lyric)和[gpt2-chinese-ancient](https://huggingface.co/uer/gpt2-chinese-ancient)。
   
-  在使用通用中文模型和中文歌词模型进行生成时，需要在输入的文本前加入一个起始符，如：若要输入“最美的不是下雨天，是曾与你躲过雨的屋檐”，正确的格式为“[CLS]最美的不是下雨天，是曾与你躲过雨的屋檐”。
+  在使用所有模型进行生成时，需要在输入的文本前加入一个起始符，如：若要输入“最美的不是下雨天，是曾与你躲过雨的屋檐”，正确的格式为“[CLS]最美的不是下雨天，是曾与你躲过雨的屋檐”。
 
 
 ## UPDATE 11.03.2020
@@ -109,12 +109,14 @@ python ./generate.py --length=50 --nsamples=4 --prefix=xxx --fast_pattern --save
 
 ## 模型分享
 |  模型名称 |   模型介绍|   分享者|  链接地址1 |  链接地址2 |
-| ------------ | :----------- | :----------- | :----------- | ------------ |
+| :----------- | :----------- | :----------- | :----------- | ------------ |
 | 散文模型  | 使用130MB的名家散文、情感散文和散文诗歌训练所得 。  |  [hughqiu](https://github.com/hughqiu "hughqiu") | [百度网盘【fpyu】](https://pan.baidu.com/s/1nbrW5iw34GRhoTin8uU2tQ)   | [GDrive](https://drive.google.com/drive/folders/1rJC4niJKMVwixUQkuL9k5teLRnEYTmUf?usp=sharing "GDrive") |
 | 诗词模型 | 使用180MB的约80万首古诗词训练所得。 | [hhou435](https://github.com/hhou435) | [百度网盘【7fev】](https://pan.baidu.com/s/1Hy0OQ5xZcTLer9MQZW8o3g) | [GDrive](https://drive.google.com/drive/folders/1Z6nF1nrgTkrZcRLHedQHXb4_M9I7yQPN?usp=sharing) |
 | 对联模型 | 使用40MB的约70万条对联训练所得。 | [hhou435](https://github.com/hhou435) | [百度网盘【i5n0】](https://pan.baidu.com/s/1j9yVQwjlXZq58wOyXK4lcg) | [GDrive](https://drive.google.com/drive/folders/1ZnsvS7oHRVueNKj_SeEhiQt86aze3ojj?usp=sharing) |
 | 通用中文模型 | 使用[CLUECorpusSmall](https://github.com/CLUEbenchmark/CLUECorpus2020/)语料训练所得。 | [hhou435](https://github.com/hhou435) | [百度网盘【n3s8】](https://pan.baidu.com/s/16x0hfBCekWju75xPeyyRfA) | [GDrive](https://drive.google.com/drive/folders/1dLEANs5z4pWS0pzrak6Q2H2Nq4iYsMsf?usp=sharing) |
-| 中文歌词模型 | 使用140MB的约15万首中文歌词训练所得。 | [hhou435](https://github.com/hhou435) | [百度网盘【0qnn】](https://pan.baidu.com/s/19x0d0bPGCWHi9L4Pu0pSiw) | [GDrive](https://drive.google.com/drive/folders/1RFq4NoQ3phCJjrhKtu2Xbn6z0krcN9TM?usp=sharing) |
+| 通用中文小模型 | 使用[CLUECorpusSmall](https://github.com/CLUEbenchmark/CLUECorpus2020/)语料训练所得。 | [hhou435](https://github.com/hhou435)           | [百度网盘【rpjk】](https://pan.baidu.com/s/1AiSm2GWhbGNxvhrcUlDXNA) | [GDrive](https://drive.google.com/drive/folders/1eerX1N8n_eFlnQ4xpxZ4iU2-Mx83pXFp?usp=sharing) |
+| 中文歌词模型   | 使用140MB的约15万首中文歌词训练所得。                        | [hhou435](https://github.com/hhou435)           | [百度网盘【0qnn】](https://pan.baidu.com/s/19x0d0bPGCWHi9L4Pu0pSiw) | [GDrive](https://drive.google.com/drive/folders/1RFq4NoQ3phCJjrhKtu2Xbn6z0krcN9TM?usp=sharing) |
+| 文言文模型 | 使用1.8GB的约300万篇文言文训练所得。 | [hhou435](https://github.com/hhou435) | [百度网盘【ek2z】](https://pan.baidu.com/s/1X3Um9HketnlGYZubY9gnew) | [GDrive](https://drive.google.com/drive/folders/1dtHTRn3fX7g8cPCCaJEXA2tmrIcImR6t?usp=sharing) |
 
 此处为热情大方的git友训练所得的模型文件，公开给所有朋友使用，同时也欢迎各位伙伴将自己训练完毕的模型公开于此处。
 
