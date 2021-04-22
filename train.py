@@ -11,7 +11,7 @@ import argparse
 
 
 class DS(Dataset):
-    def __init__(self, lines, vocab_path='vocab/vocab.txt', max_length=1024):
+    def __init__(self, lines, vocab_path="vocab/vocab.txt", max_length=1024):
         self.data = lines
         self.tok = BertTokenizer(vocab_file=vocab_path)
         self.max_length = max_length
@@ -32,7 +32,19 @@ class DS(Dataset):
 
 
 class Net(pl.LightningModule):
-    def __init__(self, batch_size, epochs, t_total=100000, config_path='config/model_config.json', data_path='data/train.json', valid_examples=100, vocab_path='vocab/vocab,txt', max_length=1024, warm_up_steps=0, lr=1e-4):
+    def __init__(
+        self,
+        batch_size,
+        epochs,
+        t_total=100000,
+        config_path="config/model_config.json",
+        data_path="data/train.json",
+        valid_examples=100,
+        vocab_path="vocab/vocab,txt",
+        max_length=1024,
+        warm_up_steps=0,
+        lr=1e-4,
+    ):
         super(Net, self).__init__()
         self.batch_size = batch_size
         self.epochs = epochs
@@ -43,8 +55,12 @@ class Net(pl.LightningModule):
         self.config = GPT2Config.from_json_file(config_path)
         self.model = GPT2LMHeadModel(config=self.config)
         self.data = [json.loads(line.strip()) for line in open(data_path)]
-        self.dataset_train = DS(self.data[:-valid_examples], vocab_path=vocab_path, max_length=max_length)
-        self.dataset_valid = DS(self.data[-valid_examples:], vocab_path=vocab_path, max_length=max_length)
+        self.dataset_train = DS(
+            self.data[:-valid_examples], vocab_path=vocab_path, max_length=max_length
+        )
+        self.dataset_valid = DS(
+            self.data[-valid_examples:], vocab_path=vocab_path, max_length=max_length
+        )
 
     def forward(self, input_ids, attention_mask):
         input_ids = input_ids
@@ -55,7 +71,7 @@ class Net(pl.LightningModule):
             labels=input_ids,
             return_dict=True,
         )
-        return r['loss']
+        return r["loss"]
 
     def train_dataloader(self):
         return DataLoader(
@@ -77,14 +93,14 @@ class Net(pl.LightningModule):
 
     def configure_optimizers(self):
         optimizer = AdamW(self.parameters(), lr=self.lr, weight_decay=0.001)
-        scheduler = get_linear_schedule_with_warmup(optimizer, self.warm_up_steps, self.t_total)
+        scheduler = get_linear_schedule_with_warmup(
+            optimizer, self.warm_up_steps, self.t_total
+        )
         scheduler = {"scheduler": scheduler, "interval": "step", "frequency": 1}
         return [optimizer], [scheduler]
 
     def training_step(self, batch, batch_nb):
-        loss = self.forward(
-            batch["input_ids"], batch["attention_mask"]
-        )
+        loss = self.forward(batch["input_ids"], batch["attention_mask"])
 
         self.log(
             "train_loss",
@@ -97,9 +113,7 @@ class Net(pl.LightningModule):
         return loss
 
     def validation_step(self, batch, batch_nb):
-        loss = self.forward(
-            batch["input_ids"], batch["attention_mask"]
-        )
+        loss = self.forward(batch["input_ids"], batch["attention_mask"])
         return loss
 
     def validation_epoch_end(self, outputs):
@@ -201,7 +215,18 @@ if __name__ == "__main__":
         callbacks=[learning_rate_callback, checkpoint_callback],
         precision=32,
     )
-    net = Net(batch_size, epochs, t_total=t_total, config_path=config_path, data_path=data_path, valid_examples=val_examples, vocab_path=vocab_path, max_length=max_length, warm_up_steps=warmup_steps, lr=lr)
+    net = Net(
+        batch_size,
+        epochs,
+        t_total=t_total,
+        config_path=config_path,
+        data_path=data_path,
+        valid_examples=val_examples,
+        vocab_path=vocab_path,
+        max_length=max_length,
+        warm_up_steps=warmup_steps,
+        lr=lr,
+    )
     # d = torch.load('output_old/best.ckpt', map_location=torch.device("cpu"))["state_dict"]
     # d.pop('model.classifier.bias')
     # d.pop('model.classifier.weight')
