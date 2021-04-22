@@ -5,12 +5,13 @@
 - Chinese version of GPT2 training code, using BERT tokenizer. It is based on the extremely awesome repository from HuggingFace team [Transformers](https://github.com/huggingface/transformers). Can write poems, news, novels, or train general language models. Support char level, word level and BPE level. Support large training corpus.
 - 中文的GPT2训练代码，使用BERT的Tokenizer。
 
-## UPDATE 04.22.2021
+## BIG UPDATE 04.22.2021
 
 - 因群众普遍反映原代码对新手不够友好，且代码本身年久失修，我使用Pytorch Lightning与Transformers库重写了一版训练与预测的代码。具体使用方法请参考本README的使用方法一栏。模型本身结构与旧代码兼容。
 - 这一版经过基本测试，可以完成训练与预测任务，代码在易用性上得到了提升。但是功能上会比原版代码有所缺失一些，如加载预训练模型的功能需要自己写一段小代码来添加一下。
 - 原版代码保存在本项目的old_gpt_2 branch中，如有需要的话用户依然可以从中获取进行学习。
 - 新版代码的依赖写在了requirements.txt文件中，请记得提前安装。
+- 请注意：本项目的预测脚本直接使用的话只支持预测本项目生成的checkpoint，如果要载入huggingface官方格式的GPT2 checkpoint，请直接使用GPT2LMModel对象的from pretrained功能进行载入。之后的预测流程是一样的。
 
 ## UPDATE 02.06.2021
 
@@ -56,6 +57,14 @@
 3. （可选）准备tokenizer词表，放在vocab文件夹中。
 4. 运行 bash train.sh进行训练。具体训练参数可以参考train.py文件中的argparse相关描述。
 5. 运行 python3 generate.py 进行生成，生成的前缀可以在prefix参数中进行设置。可参考源码中参数设定部分代码。
+
+## 注意
+
+- 因群众普遍反映原代码对新手不够友好，且代码本身年久失修，我使用Pytorch Lightning与Transformers库重写了一版训练与预测的代码。具体使用方法请参考本README的使用方法一栏。模型本身结构与旧代码兼容。
+- 这一版经过基本测试，可以完成训练与预测任务，代码在易用性上得到了提升。但是功能上会比原版代码有所缺失一些，如加载预训练模型的功能需要自己写一行代码来添加一下。
+- 原版代码保存在本项目的old_gpt_2 branch中，如有需要的话用户依然可以从中获取进行学习。
+- 新版代码的依赖写在了requirements.txt文件中，请记得提前安装。
+- 请注意：本项目的预测脚本直接使用的话只支持预测本项目生成的checkpoint，如果要载入huggingface官方格式的GPT2 checkpoint，请直接使用GPT2LMModel对象的from pretrained功能进行载入。之后的预测流程是一样的。
 
 ## 语料
 
