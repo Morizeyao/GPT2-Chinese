@@ -9,3 +9,9 @@ data/
 .idea/modules.xml
 .idea/vcs.xml
 .idea
+.vscode
+*.pyc
+model
+*.ckpt
+*.log
+log
