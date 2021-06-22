@@ -136,7 +136,8 @@ def fast_sample_sequence(
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--device", default="0", type=str, required=False, help="生成设备")
-    parser.add_argument("--length", default=-1, type=int, required=False, help="生成长度")
+    parser.add_argument("--length", default=512, type=int, required=False, help="生成长度")
+    parser.add_argument("--n_ctx", default=1024, type=int, required=False, help="生成时考虑的上下文长度")
     parser.add_argument(
         "--batch_size", default=1, type=int, required=False, help="生成的batch size"
     )
@@ -186,6 +187,7 @@ def main():
 
     os.environ["CUDA_VISIBLE_DEVICES"] = args.device  # 此处设置程序使用哪些显卡
     length = args.length
+    n_ctx = args.n_ctx
     batch_size = args.batch_size
     nsamples = args.nsamples
     temperature = args.temperature
@@ -208,14 +210,14 @@ def main():
     model.to(device)
     model.eval()
 
-    for i in range(10):
+    for i in range(nsamples):
         raw_text = args.prefix
-        encoded = tokenizer.encode_plus(raw_text)["input_ids"]
+        encoded = tokenizer.encode_plus(raw_text)["input_ids"][:-1]
         out = sample_sequence(
             model,
             encoded,
-            length=512,
-            n_ctx=1024,
+            length=length,
+            n_ctx=n_ctx,
             tokenizer=tokenizer,
             temperature=temperature,
             top_k=topk,
