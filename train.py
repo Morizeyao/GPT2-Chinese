@@ -40,7 +40,7 @@ class Net(pl.LightningModule):
         config_path="config/model_config.json",
         data_path="data/train.json",
         valid_examples=100,
-        vocab_path="vocab/vocab,txt",
+        vocab_path="vocab/vocab.txt",
         max_length=1024,
         warm_up_steps=0,
         lr=1e-4,
