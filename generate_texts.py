@@ -171,7 +171,7 @@ def main():
                 for i, item in enumerate(text):
                     if item == '[MASK]':
                         text[i] = ''
-                    if item == '[CLS]' or item == '[SEP]':
+                    if item in ('[CLS]','[SEP]'):
                         text[i] = '\n'
 
                 print("=" * 40 + " SAMPLE " + str(generated) + " " + "=" * 40)
