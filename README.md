@@ -49,6 +49,12 @@
 ## 使用方法
 
 - 在项目根目录建立data文件夹。将训练语料以train.json为名放入data目录中。**train.json里是一个json列表，列表的每个元素都分别是一篇要训练的文章的文本内容（而不是文件链接）**。
+```python 
+train_list = ["只见那人xxxxxx....", "郭靖xxxxx.....", "张君宝xxxx....."]
+with open("data/train.json", "w") as f:
+    json.dump(train_list, f)
+```
+
 - 运行train.py文件，勾选 --raw ，会自动预处理数据。
 - 预处理完成之后，会自动执行训练。
 
