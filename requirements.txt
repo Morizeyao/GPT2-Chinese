@@ -1,9 +1,4 @@
-transformers==2.1.1
-torch
-numpy
-tqdm
-sklearn
-keras
-tb-nightly
-future
-thulac
+pytorch-lightning==1.2.2
+transformers==4.2.1
+torch==1.8.0
+tqdm==4.56.0
