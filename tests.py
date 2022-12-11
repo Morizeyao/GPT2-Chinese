@@ -12,7 +12,6 @@ class TestMain(unittest.TestCase):
         from train import main
         args = [
             '--data_path', 'data/train.txt',
-            '--t_total', '1000',
             '--batch_size', '2',
             # '--devices', '0'
             '--config_path', self.model_config_path,

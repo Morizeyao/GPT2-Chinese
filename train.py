@@ -37,7 +37,6 @@ class Net(pl.LightningModule):
             self,
             batch_size,
             epochs,
-            t_total=100000,
             config_path="config/model_config.json",
             data_path="data/train.json",
             valid_examples=100,
@@ -48,7 +47,6 @@ class Net(pl.LightningModule):
         super(Net, self).__init__()
         self.batch_size = batch_size
         self.epochs = epochs
-        self.t_total = t_total
         self.warm_up_steps = warm_up_steps
         self.lr = lr
         self.model_name = "bert_pretrained_model"
@@ -58,6 +56,7 @@ class Net(pl.LightningModule):
         self.tokenizer = BertTokenizer(vocab_file=vocab_path, model_max_length=self.config.max_length)
         with open(data_path, encoding='utf-8') as file:
             self.data = [json.loads(line.strip()) for line in file]
+        self.t_total = len(self.data) * epochs
         self.dataset_train = DS(self.data[:-valid_examples], self.tokenizer)
         self.dataset_valid = DS(self.data[-valid_examples:], self.tokenizer)
 
@@ -176,9 +175,6 @@ def main():
         "--val_examples", default=100, type=int, required=False, help="选择多少验证集样本"
     )
     parser.add_argument(
-        "--t_total", default=100000, type=int, required=False, help="计划训练多少步"
-    )
-    parser.add_argument(
         "--log_step", default=1, type=int, required=False, help="多少步汇报一次loss"
     )
     parser.add_argument(
@@ -198,7 +194,6 @@ def main():
     warmup_steps = args.warmup_steps
     data_path = args.data_path
     config_path = args.config_path
-    t_total = args.t_total
 
     checkpoint_callback = ModelCheckpoint(
         dirpath=output_path,
@@ -221,7 +216,6 @@ def main():
     net = Net(
         batch_size,
         epochs,
-        t_total=t_total,
         config_path=config_path,
         data_path=data_path,
         valid_examples=val_examples,
