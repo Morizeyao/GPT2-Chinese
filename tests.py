@@ -1,16 +1,12 @@
 import unittest
 from typing import List
-import logging
-
-logging.basicConfig(level=logging.DEBUG)
-
-CONFIG_PATH: str = 'config/model_config_small.json'
 
 
-# CONFIG_PATH: str = 'config/model_config_test.json'
+class TestMain(unittest.TestCase):
+    def setUp(self) -> None:
+        # self.model_config_path: str = 'config/model_config_test.json'
+        self.model_config_path: str = 'config/model_config_small.json'
 
-
-class TestTrain(unittest.TestCase):
     def test_train(self):
         import sys
         from train import main
@@ -19,7 +15,7 @@ class TestTrain(unittest.TestCase):
             '--t_total', '1000',
             '--batch_size', '2',
             # '--devices', '0'
-            '--config_path', CONFIG_PATH,
+            '--config_path', self.model_config_path,
             # '--config_path', 'config/model_config_test.json',
             '--epochs', '2'
         ]
@@ -27,15 +23,12 @@ class TestTrain(unittest.TestCase):
         main()
         self.assertTrue(True)
 
-
-class TestLoad(unittest.TestCase):
-    def test_load_from_checkpoint(self):
+    def test_generate(self):
         import torch
-        from timer import timer
         from transformers import BertTokenizer, GPT2Config, GPT2LMHeadModel, TextGenerationPipeline
         from collections import OrderedDict
 
-        model_config_path: str = CONFIG_PATH
+        model_config_path: str = self.model_config_path
         vocab_path: str = 'vocab/vocab.txt'
         checkpoint_path: str = 'model/epoch=1-step=862.ckpt'
 
@@ -50,26 +43,26 @@ class TestLoad(unittest.TestCase):
 
         tokenizer: BertTokenizer = BertTokenizer(vocab_file=vocab_path)
 
+        # load using transformers api
         # model: GPT2LMHeadModel = GPT2LMHeadModel.from_pretrained('model')
         # tokenizer: BertTokenizer = BertTokenizer.from_pretrained('model')
 
         model.eval()
 
         # pipeline
-        with timer('pipeline'):
-            text: str = '我叫'
-            pipeline = TextGenerationPipeline(model, tokenizer)
-            pad_token_id = tokenizer('[PAD]')['input_ids'][1]
-            result = pipeline(text, max_length=20, pad_token_id=pad_token_id)
-            print(result)
+        text: str = '我叫'
+        pipeline = TextGenerationPipeline(model, tokenizer)
+        pad_token_id = tokenizer('[PAD]')['input_ids'][1]
+        result = pipeline(text, max_length=20, pad_token_id=pad_token_id)
+        print(result)
 
         # manual
-        with timer('manual'):
-            input_ids = tokenizer('[CLS]' + text, return_tensors='pt', padding=False, add_special_tokens=False)['input_ids']
-            output_ids: torch.Tensor = model.generate(input_ids, max_length=20, pad_token_id=pad_token_id, do_sample=True)
-            output_tokens: List[str] = tokenizer.convert_ids_to_tokens(output_ids[0])
-            output_text: str = ''.join(filter(lambda x: x not in ['[SEP]', '[PAD]', '[CLS]'], output_tokens))
-            print(output_text)
+        input_ids = tokenizer('[CLS]' + text, return_tensors='pt', padding=False, add_special_tokens=False)['input_ids']
+        output_ids: torch.Tensor = model.generate(input_ids, max_length=20, pad_token_id=pad_token_id, do_sample=True)
+        output_tokens: List[str] = tokenizer.convert_ids_to_tokens(output_ids[0])
+        output_text: str = ''.join(filter(lambda x: x not in ['[SEP]', '[PAD]', '[CLS]'], output_tokens))
+        print(output_text)
+
         self.assertTrue(True)
 
 
