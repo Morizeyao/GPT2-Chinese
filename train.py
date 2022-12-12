@@ -59,7 +59,7 @@ class Net(pl.LightningModule):
         self.tokenizer = BertTokenizer(vocab_file=vocab_path,
                                        model_max_length=self.config.n_positions) if tokenizer is None else tokenizer
         if additional_special_tokens:
-            self.tokenizer.add_special_tokens({'additional_special_tokens': additional_special_tokens.values()})
+            self.tokenizer.add_special_tokens({'additional_special_tokens': list(additional_special_tokens.values())})
         self.data: List[str] = dataset
         self.t_total = len(self.data) * epochs
         self.dataset_train = DS(self.data[:-valid_examples], self.tokenizer)
