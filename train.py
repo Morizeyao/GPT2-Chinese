@@ -1,6 +1,6 @@
 import argparse
 import json
-from typing import List
+from typing import List, Dict
 
 import pytorch_lightning as pl
 import torch
@@ -44,6 +44,9 @@ class Net(pl.LightningModule):
             vocab_path="vocab/vocab.txt",
             warm_up_steps=0,
             lr=1e-4,
+            model: GPT2LMHeadModel = None,
+            tokenizer: BertTokenizer = None,
+            additional_special_tokens: Dict[str, str] = None,
     ):
         super(Net, self).__init__()
         self.batch_size = batch_size
@@ -52,9 +55,11 @@ class Net(pl.LightningModule):
         self.lr = lr
         self.model_name = "bert_pretrained_model"
         self.config = GPT2Config.from_json_file(config_path)
-        self.config.max_length = self.config.n_positions
-        self.model = GPT2LMHeadModel(config=self.config)
-        self.tokenizer = BertTokenizer(vocab_file=vocab_path, model_max_length=self.config.max_length)
+        self.model = GPT2LMHeadModel(config=self.config) if model is None else model
+        self.tokenizer = BertTokenizer(vocab_file=vocab_path,
+                                       model_max_length=self.config.n_positions) if tokenizer is None else tokenizer
+        if additional_special_tokens:
+            self.tokenizer.add_special_tokens({'additional_special_tokens': additional_special_tokens.values()})
         self.data: List[str] = dataset
         self.t_total = len(self.data) * epochs
         self.dataset_train = DS(self.data[:-valid_examples], self.tokenizer)
