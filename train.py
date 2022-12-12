@@ -1,12 +1,13 @@
-from transformers import GPT2LMHeadModel, GPT2Config, get_linear_schedule_with_warmup, BertTokenizer
-from torch.optim import AdamW
-from torch.utils.data import Dataset, DataLoader
-from pytorch_lightning.callbacks import ModelCheckpoint, LearningRateMonitor
+import argparse
+import json
 from typing import List
+
 import pytorch_lightning as pl
 import torch
-import json
-import argparse
+from pytorch_lightning.callbacks import ModelCheckpoint, LearningRateMonitor
+from torch.optim import AdamW
+from torch.utils.data import Dataset, DataLoader
+from transformers import GPT2LMHeadModel, GPT2Config, get_linear_schedule_with_warmup, BertTokenizer
 
 
 # 11846807
@@ -35,10 +36,10 @@ class DS(Dataset):
 class Net(pl.LightningModule):
     def __init__(
             self,
+            dataset: List[str],
             batch_size,
             epochs,
             config_path="config/model_config.json",
-            data_path="data/train.json",
             valid_examples=100,
             vocab_path="vocab/vocab.txt",
             warm_up_steps=0,
@@ -54,8 +55,7 @@ class Net(pl.LightningModule):
         self.config.max_length = self.config.n_positions
         self.model = GPT2LMHeadModel(config=self.config)
         self.tokenizer = BertTokenizer(vocab_file=vocab_path, model_max_length=self.config.max_length)
-        with open(data_path, encoding='utf-8') as file:
-            self.data = [json.loads(line.strip()) for line in file]
+        self.data: List[str] = dataset
         self.t_total = len(self.data) * epochs
         self.dataset_train = DS(self.data[:-valid_examples], self.tokenizer)
         self.dataset_valid = DS(self.data[-valid_examples:], self.tokenizer)
@@ -213,11 +213,15 @@ def main():
         callbacks=[learning_rate_callback, checkpoint_callback],
         precision=32,
     )
+
+    with open(data_path, encoding='utf-8') as f:
+        dataset: List[str] = [json.loads(line.strip()) for line in f]
+
     net = Net(
+        dataset,
         batch_size,
         epochs,
         config_path=config_path,
-        data_path=data_path,
         valid_examples=val_examples,
         vocab_path=vocab_path,
         warm_up_steps=warmup_steps,
@@ -233,5 +237,6 @@ def main():
     net.model.save_pretrained(output_path)
     net.tokenizer.save_pretrained(output_path)
 
-    if __name__ == "__main__":
-        main()
+
+if __name__ == "__main__":
+    main()
