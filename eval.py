@@ -10,6 +10,8 @@ from tqdm import tqdm
 from torch.nn import DataParallel
 
 
+
+# hi Im arju
 def build_files(data_path, tokenized_data_path, num_pieces, full_tokenizer, min_length):
     if not os.path.exists(tokenized_data_path):
         os.mkdir(tokenized_data_path)
