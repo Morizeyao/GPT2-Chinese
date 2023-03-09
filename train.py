@@ -216,7 +216,8 @@ def main():
         accelerator=accelerator,
         val_check_interval=eval_interval,
         callbacks=[learning_rate_callback, checkpoint_callback],
-        precision=32,
+        # precision=32,
+        precision=16,
     )
 
     with open(data_path, encoding='utf-8') as f:
