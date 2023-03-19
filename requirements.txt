@@ -2,3 +2,4 @@
 pytorch-lightning~=1.8.4.post0
 torch~=1.12.0
 transformers~=4.25.1
+tqdm~=4.65.0
