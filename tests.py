@@ -8,7 +8,8 @@ from typing import List
 class TestMain(unittest.TestCase):
     def setUp(self) -> None:
         # self.model_config_path: str = 'config/model_config_test.json'
-        self.model_config_path: str = 'config/model_config_small.json'
+        # self.model_config_path: str = 'config/model_config_small.json'
+        self.model_config_path: str = 'config/model_config.json'
         self.vocab_path: str = 'vocab/vocab.txt'
         self.config: GPT2Config = GPT2Config.from_json_file(self.model_config_path)
 
