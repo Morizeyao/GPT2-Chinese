@@ -2,7 +2,7 @@ transformers==2.1.1
 torch
 numpy
 tqdm
-sklearn
+scikit-learn
 keras
 tb-nightly
 future
