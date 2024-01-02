@@ -2,6 +2,7 @@ import argparse
 import json
 import os
 import random
+import time
 from datetime import datetime
 
 import numpy as np
@@ -167,7 +168,8 @@ def main():
         x = torch.ones(1, device=mps_device)
         device = "mps"
     print("using device:", device)
-
+    start_time = time.time()
+    save_interval = 300
     raw_data_path = args.raw_data_path
     tokenized_data_path = args.tokenized_data_path
     raw = args.raw  # 选择是否从零开始构建数据集
@@ -253,6 +255,21 @@ def main():
         random.shuffle(x)
         piece_num = 0
         for i in x:
+            if time.time() - start_time > save_interval:
+                checkpoint = {
+                    "epoch": epoch,
+                    "batch_idx": i,
+                    "model_state_dict": model.state_dict(),
+                    "optimizer_state_dict": optimizer.state_dict(),
+                    "loss": loss,  # Assuming 'loss' is your loss variable
+                    "random_state_pytorch": torch.get_rng_state(),
+                    "random_state_np": np.random.get_state(),
+                    "random_state_python": random.getstate(),
+                    # Add scheduler state_dict if you're using a scheduler
+                    # 'scheduler_state_dict': scheduler.state_dict(),
+                }
+                torch.save(checkpoint, f"checkpoint_{epoch}_{i}.pth")
+                start_time = time.time()
             with open(
                 tokenized_data_path + "tokenized_train_{}.txt".format(i), "r"
             ) as f:
