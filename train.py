@@ -139,6 +139,14 @@ def main():
         "--vocab_bpe", default="tokenizations/vocab.bpe", type=str, help="vocab.bpe"
     )
 
+    parser.add_argument(
+        "--input_file",
+        type=str,
+        help="Path to the .ipt file to continue training",
+        default=None,
+    )
+    # ... rest of the argument setup ...
+
     args = parser.parse_args()
     print("args:\n" + args.__repr__())
 
@@ -209,10 +217,8 @@ def main():
         model = transformers.modeling_gpt2.GPT2LMHeadModel.from_pretrained(
             args.pretrained_model
         )
-    model.train()
-    model.to(device)
-
     num_parameters = 0
+
     parameters = model.parameters()
     for parameter in parameters:
         num_parameters += parameter.numel()
@@ -231,6 +237,24 @@ def main():
     scheduler = transformers.WarmupLinearSchedule(
         optimizer, warmup_steps=warmup_steps, t_total=total_steps
     )
+
+    if args.input_file is not None:
+        checkpoint = torch.load(args.input_file)
+        model.load_state_dict(checkpoint["model_state_dict"])
+        optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
+        epoch = checkpoint["epoch"]
+        batch_idx = checkpoint["batch_idx"]
+        loss = checkpoint["loss"]
+        torch.set_rng_state(checkpoint["random_state_pytorch"])
+        np.random.set_state(checkpoint["random_state_np"])
+        random.setstate(checkpoint["random_state_python"])
+        model.eval()
+        model.to(device)
+        print("Loaded checkpoint from %s" % args.input_file)
+
+    model.train()
+    model.to(device)
+
     if fp16:
         try:
             from apex import amp
@@ -335,7 +359,7 @@ def main():
                             # Add scheduler state_dict if you're using a scheduler
                             # 'scheduler_state_dict': scheduler.state_dict(),
                         }
-                        torch.save(checkpoint, f"{output_dir}/checkpoint_{epoch}_{i}.pth")
+                        torch.save(checkpoint, f"{output_dir}/checkpoint.pth")
                         start_time = time.time()
                 overall_step += 1
             piece_num += 1
