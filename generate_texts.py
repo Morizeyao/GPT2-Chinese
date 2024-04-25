@@ -164,15 +164,15 @@ def main():
                 generated += 1
                 text = tokenizer.convert_ids_to_tokens(out)
 
-                for i, item in enumerate(text[:-1]):  # 确保英文前后有空格
+                for idx, item in enumerate(text[:-1]):  # 确保英文前后有空格
                     if is_word(item) and is_word(text[i + 1]):
-                        text[i] = item + ' '
+                        text[idx] = item + ' '
 
-                for i, item in enumerate(text):
+                for idx, item in enumerate(text):
                     if item == '[MASK]':
-                        text[i] = ''
+                        text[idx] = ''
                     if item == '[CLS]' or item == '[SEP]':
-                        text[i] = '\n'
+                        text[idx] = '\n'
 
                 print("=" * 40 + " SAMPLE " + str(generated) + " " + "=" * 40)
                 text = ''.join(text).replace('##', '').strip()

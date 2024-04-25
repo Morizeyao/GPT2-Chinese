@@ -22,7 +22,7 @@ def build_files(raw_data_path, tokenized_data_path, full_tokenizer, num_pieces):
     single = ''.join(lines)
     len_single = len(single)
     if not os.path.exists(tokenized_data_path):
-        os.mkdir(tokenized_data_path)
+        os.makedirs(tokenized_data_path, exist_ok=True)
     for i in tqdm(range(num_pieces)):
         single_ids = full_tokenizer.convert_tokens_to_ids(
             full_tokenizer.tokenize(single[len_single // num_pieces * i: len_single // num_pieces * (i + 1)]))
