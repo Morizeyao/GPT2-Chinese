@@ -1,0 +1,1 @@
+python3 train.py --data_path data/train.json
